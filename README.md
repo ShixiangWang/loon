@@ -1,12 +1,11 @@
 # loon
 
-Add a short description here!
-
+Super fast Python toolkit for operating remote host based on SSH.
 
 ## Description
 
-A longer description of your project goes here...
 
+This library is built on the top of [ssh2-python library](https://github.com/ParallelSSH/ssh2-python).
 
 ## Note
 
