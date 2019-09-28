@@ -15,8 +15,9 @@ also be used as template for Python modules.
 Note: This skeleton file can be safely removed if not needed!
 """
 
-import argparse
+import os
 import sys
+import argparse
 import logging
 
 from loon import __version__
@@ -24,6 +25,12 @@ from loon import __version__
 __author__ = "ShixiangWang"
 __copyright__ = "ShixiangWang"
 __license__ = "mit"
+# User can modify the following line
+# to change the default path for host file
+__host_file__ = "~/.config/loon/host.json"
+# Get the absolute path for host file
+# NEVER CHANGE IT!
+__host_file__ = os.path.expanduser(__host_file__)
 
 _logger = logging.getLogger(__name__)
 
