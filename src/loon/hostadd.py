@@ -10,29 +10,33 @@ from loon.utils import create_parentdir, isfile, isdir
 
 _logger = logging.getLogger(__name__)
 
-def hostadd(username, host, port=22, hostfile=__host_file__):
+def hostadd(username, host, port=22, hostfile=__host_file__, _logger = _logger):
     info = [username, host, port]
+    _logger.info("Checking if host file exists...")
     if not isfile(hostfile):
+        _logger.info("Creating parent directory for host file...")
         # Create parent dir if hostfile does not exist
         create_parentdir(hostfile)
         cfg = {'current':info, 'available':[info]}
+        _logger.info("Saving host info to file...")
         with open(hostfile, 'w') as f:
             json.dump(cfg, f)
         print("=> Added successfully!") 
     else:
+        _logger.info("Reading existed host file...")
         with open(hostfile, 'r') as f:
             cfg = json.load(f)
-        exist_flag = False
 
+        _logger.info("Checking duplicate of host info...")
+        exist_flag = False
         for h in cfg['available']:
             if h == info:
                 exist_flag = True
-
         if exist_flag:
             print("=> Input host exists. Will not change.")
         else:
+            _logger.info("Updating info and saving to file...")
             cfg['available'].append(info)
-
             with open(hostfile, 'w') as f:
                 json.dump(cfg, f)
 
