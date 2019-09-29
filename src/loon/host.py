@@ -9,11 +9,6 @@ from ssh2.session import Session
 # Reference:
 # https://github.com/ParallelSSH/ssh2-python/tree/master/examples
 
-class host():
-    """
-    Representation of remote host
-    """
-    pass
 
 
 USERNAME = "Administrator"

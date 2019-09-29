@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-from pkg_resources import get_distribution, DistributionNotFound
+import os
 
-try:
-    # Change here if project is renamed and does not equal the package name
-    dist_name = __name__
-    __version__ = "0.1.0"
-except DistributionNotFound:
-    __version__ = 'unknown'
-finally:
-    del get_distribution, DistributionNotFound
+__version__ = "0.1.0"
+__author__ = "ShixiangWang"
+__copyright__ = "ShixiangWang"
+__license__ = "mit"
+# User can modify the following line
+# to change the default path for host file
+__host_file__ = "~/.config/loon/host.json"
+# Get the absolute path for host file
+# NEVER CHANGE IT!
+__host_file__ = os.path.expanduser(__host_file__)
