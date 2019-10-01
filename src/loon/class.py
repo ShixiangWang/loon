@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 """Classes used in loon package"""
 
+import os
 import json
 import pprint
+import socket
+from ssh2.session import Session
 from loon.skeleton import __host_file__
 from loon.utils import create_parentdir, isfile, isdir
 
@@ -87,6 +90,8 @@ class Host:
         
     def list(self):
         """List all remote hosts"""
+
+        #TODO Create a pretty table for showing list
         pp = pprint.PrettyPrinter(width=40)
         print()
         print("Active host")
@@ -98,13 +103,38 @@ class Host:
         pp.pprint(self.available_hosts)
         return
     
-    def connect(self):
-        """Connect active host"""
-        pass
+    def connect(self, privatekey_file="~/.ssh/id_rsa", passphrase=''):
+        """Connect active host and open a session"""
+        privatekey_file = os.path.expanduser(privatekey_file)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((self.active_host[1], self.active_host[2]))
+        s = Session()
+        s.handshake(sock)
+        try:
+            # Try using private key file first
+            s.userauth_publickey_fromfile(self.active_host[0], privatekey_file, passphrase)
+        except:
+            # Use password to auth
+            passwd = input('No private key found.\nEnter your password for %s: ' %self.active_host[0])
+            s.userauth_password(self.active_host[0], passwd)
+        self.session = s.open_session()
+        return
     
-    def cmd(self):
+    def cmd(self, commands):
         """Run command(s) in active remote host"""
-        pass
+        self.connect()
+        self.session.execute(commands)
+        size, data = self.session.read()
+        # data is byte type
+        datalist = []
+        while size > 0:
+            data = data.decode('utf-8')
+            print(data, end='')
+            datalist.append(data)
+            size, data = self.session.read()
+        # Return a list containing output from commands 
+        return datalist
+
 
     def upload(self):
         """Upload files to active remote host"""
@@ -133,11 +163,7 @@ class PBS:
 
 if __name__ == "__main__":
     host = Host()
-    host.add(username="wangshx", host="127.0.0.1")
-    host.add(username="wsx", host="127.0.0.1", port=21)
-    host.add(username="zzz", host="127.0.0.1")
+    host.add(username="wsx", host="10.19.24.165")
     host.list()
-    host.delete(username="zzz", host="127.0.0.1")
-    host.switch(username="wangshx", host="127.0.0.1")
-    #host.delete(username="127.0.0.1", host="127.0.0.1")
-    host.list()
+    host.cmd("ls -l")
+

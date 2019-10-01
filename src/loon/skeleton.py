@@ -31,6 +31,7 @@ __host_file__ = "~/.config/loon/host.json"
 # Get the absolute path for host file
 # NEVER CHANGE IT!
 __host_file__ = os.path.expanduser(__host_file__)
+__privatekey_file__ = os.path.expanduser("~/.ssh/id_rsa")
 
 _logger = logging.getLogger(__name__)
 
