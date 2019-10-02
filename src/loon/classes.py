@@ -8,10 +8,10 @@ import pprint
 import socket
 from ssh2.session import Session
 if __package__ == '' or __package__ is None:  # Use for test
-    from skeleton import __host_file__
+    from __init__ import __host_file__
     from utils import create_parentdir, isfile, isdir
 else:
-    from loon.skeleton import __host_file__
+    from loon import __host_file__
     from loon.utils import create_parentdir, isfile, isdir    
 
 class Host:
@@ -88,7 +88,7 @@ class Host:
         if info in self.available_hosts:
             self.active_host = info
             self.save_hosts()
-            print("=> Done.")
+            print("=> Activated.")
         else:
             print("Host does not exist, please check input with hostlist command!")
         return
@@ -143,8 +143,9 @@ class Host:
             # Get exit status
             print("Exit status: %s" % self.session.get_exit_status())
             print("Error info:\n%r" %e)
-        finally:
-            self.session.close()
+        # finally:
+        #     self.session.close()
+        
         # Return a list containing output from commands 
         return datalist
 

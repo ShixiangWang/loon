@@ -1,18 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-This is a skeleton file that can serve as a starting point for a Python
-console script. To run this script uncomment the following lines in the
-[options.entry_points] section in setup.cfg:
-
-    console_scripts =
-         fibonacci = loon.skeleton:run
-
-Then run `python setup.py install` which will install the command `fibonacci`
-inside your current environment.
-Besides console scripts, the header (i.e. until _logger...) of this file can
-also be used as template for Python modules.
-
-Note: This skeleton file can be safely removed if not needed!
+The skeleton of loon package.
+Set command in [options.entry_points] section of setup.cfg file
+Install with `python setup.py install`
 """
 
 import os
@@ -22,19 +12,10 @@ import logging
 
 if __package__ == '' or __package__ is None:  # Use for test
   from __init__ import __version__
+  from classes import Host
 else:
   from loon import __version__
-
-__author__ = "ShixiangWang"
-__copyright__ = "ShixiangWang"
-__license__ = "mit"
-# User can modify the following line
-# to change the default path for host file
-__host_file__ = "~/.config/loon/host.json"
-# Get the absolute path for host file
-# NEVER CHANGE IT!
-__host_file__ = os.path.expanduser(__host_file__)
-__privatekey_file__ = os.path.expanduser("~/.ssh/id_rsa")
+  from loon.classes import Host
 
 _logger = logging.getLogger(__name__)
 
@@ -49,31 +30,87 @@ def parse_args(args):
       :obj:`argparse.Namespace`: command line parameters namespace
     """
     parser = argparse.ArgumentParser(
-        description="Just a Fibonacci demonstration")
+        description="Be an efficient loon.")
+
+    # Show version info
     parser.add_argument(
         "--version",
         action="version",
         version="loon {ver}".format(ver=__version__))
-    parser.add_argument(
-        dest="n",
-        help="n-th Fibonacci number",
-        type=int,
-        metavar="INT")
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        dest="loglevel",
-        help="set loglevel to INFO",
-        action="store_const",
-        const=logging.INFO)
-    parser.add_argument(
-        "-vv",
-        "--very-verbose",
-        dest="loglevel",
-        help="set loglevel to DEBUG",
-        action="store_const",
-        const=logging.DEBUG)
-    return parser.parse_args(args)
+
+    # Common arguments
+    host_parent_parser = argparse.ArgumentParser(add_help=False)
+    host_parent_parser.add_argument(
+      '-U', '--username',
+      dest='username',
+      help='Username for remote host',
+      type = str, 
+      required=True)
+    host_parent_parser.add_argument(
+      '-H', '--host',
+      dest='host',
+      help='IP address for remote host (e.g. 192.168.0.1)',
+      type = str,
+      required=True)
+    host_parent_parser.add_argument(
+      '-P', '--port',
+      dest="port",
+      help='Port for remote host, default is 22', 
+      type = int,
+      default=22)
+
+    host_parent_parser.add_argument(
+      "-v",
+      "--verbose",
+      dest="loglevel",
+      help="set loglevel to INFO",
+      action="store_const",
+      const=logging.INFO)
+
+    # Subcommands
+    subparsers = parser.add_subparsers(
+      title='subcommands',
+      #description='valid subcommands',
+      help="description",
+      dest="subparsers_name")
+
+    # Create the parser for the "add" command
+    parser_add = subparsers.add_parser(
+      'add',
+      help="Add a remote host",
+      parents=[host_parent_parser])
+    parser_add.add_argument(
+      '-A',
+      '--active',
+      dest='switch_active',
+      help='Set new host as active host',
+      action='store_true')
+    
+    # Create the parser for the "add" command
+    parser_del = subparsers.add_parser(
+      'delete',
+      help="Delete a remote host",
+      parents=[host_parent_parser])
+
+    # Create the parser for the "switch" command
+    parser_switch = subparsers.add_parser(
+      'switch',
+      help="Switch active remote host",
+      parents=[host_parent_parser])
+
+    # Create the parser for the "list" command
+    parser_list = subparsers.add_parser(
+      'list',
+      help="List all remote hosts")
+    parser_list.add_argument(
+      "-v",
+      "--verbose",
+      dest="loglevel",
+      help="set loglevel to INFO",
+      action="store_const",
+      const=logging.INFO)
+
+    return parser.parse_args(args), parser
 
 
 def setup_logging(loglevel):
@@ -93,11 +130,47 @@ def main(args):
     Args:
       args ([str]): command line parameter list
     """
-    args = parse_args(args)
+
+    args_bk = args
+    args, parser = parse_args(args)
+    if len(args_bk) == 0:
+      parser.print_help()
+      parser.exit()
+
     setup_logging(args.loglevel)
-    _logger.debug("Starting crazy calculations...")
-    print("The {}-th Fibonacci number is {}".format(args.n, fib(args.n)))
-    _logger.info("Script ends here")
+    _logger.info("Starting loon...")
+    host = Host()
+
+    # Deparse arguments
+    if args.subparsers_name == 'add':
+      _logger.info("Add command is detected.")
+      host.add(
+        username=args.username,
+        host=args.host,
+        port=args.port)
+      if args.switch_active:
+        host.switch(
+          username=args.username,
+          host=args.host,
+          port=args.port)
+    elif args.subparsers_name == 'delete':
+      _logger.info("Delete command is detected.")
+      host.delete(
+        username=args.username,
+        host=args.host,
+        port=args.port)
+    elif args.subparsers_name == 'switch':
+      _logger.info("Switch command is detected.")
+      host.switch(
+        username=args.username,
+        host=args.host,
+        port=args.port)
+    elif args.subparsers_name == 'list':
+      _logger.info("List command is detected.")
+      host.list()
+
+
+    _logger.info("loon ends here")
 
 
 def run():
