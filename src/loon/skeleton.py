@@ -20,7 +20,10 @@ import sys
 import argparse
 import logging
 
-from loon import __version__
+if __package__ == '' or __package__ is None:  # Use for test
+  from __init__ import __version__
+else:
+  from loon import __version__
 
 __author__ = "ShixiangWang"
 __copyright__ = "ShixiangWang"
@@ -34,22 +37,6 @@ __host_file__ = os.path.expanduser(__host_file__)
 __privatekey_file__ = os.path.expanduser("~/.ssh/id_rsa")
 
 _logger = logging.getLogger(__name__)
-
-
-def fib(n):
-    """Fibonacci example function
-
-    Args:
-      n (int): integer
-
-    Returns:
-      int: n-th Fibonacci number
-    """
-    assert n > 0
-    a, b = 1, 1
-    for i in range(n-1):
-        a, b = b, a+b
-    return a
 
 
 def parse_args(args):

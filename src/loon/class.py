@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 """Classes used in loon package"""
 
+import sys
 import os
 import json
 import pprint
 import socket
 from ssh2.session import Session
-from loon.skeleton import __host_file__
-from loon.utils import create_parentdir, isfile, isdir
+if __package__ == '' or __package__ is None:  # Use for test
+    from skeleton import __host_file__
+    from utils import create_parentdir, isfile, isdir
+else:
+    from loon.skeleton import __host_file__
+    from loon.utils import create_parentdir, isfile, isdir    
 
 class Host:
     """
@@ -124,17 +129,24 @@ class Host:
         """Run command(s) in active remote host"""
         self.connect()
         self.session.execute(commands)
-        size, data = self.session.read()
-        # data is byte type
         datalist = []
-        while size > 0:
-            data = data.decode('utf-8')
-            print(data, end='')
-            datalist.append(data)
+        try:
+            # Get output
             size, data = self.session.read()
+            # Here data is byte type
+            while size > 0:
+                data = data.decode('utf-8')
+                print(data, end='')
+                datalist.append(data)
+                size, data = self.session.read()
+        except Exception as e:
+            # Get exit status
+            print("Exit status: %s" % self.session.get_exit_status())
+            print("Error info:\n%r" %e)
+        finally:
+            self.session.close()
         # Return a list containing output from commands 
         return datalist
-
 
     def upload(self):
         """Upload files to active remote host"""
@@ -166,4 +178,3 @@ if __name__ == "__main__":
     host.add(username="wsx", host="10.19.24.165")
     host.list()
     host.cmd("ls -l")
-
