@@ -11,10 +11,10 @@ import argparse
 import logging
 
 if __package__ == '' or __package__ is None:  # Use for test
-  from __init__ import __version__
+  from __init__ import __version__, __author__, __license__
   from classes import Host
 else:
-  from loon import __version__
+  from loon import __version__, __author__, __license__
   from loon.classes import Host
 
 _logger = logging.getLogger(__name__)
@@ -36,7 +36,12 @@ def parse_args(args):
     parser.add_argument(
         "--version",
         action="version",
-        version="loon {ver}".format(ver=__version__))
+        version="loon {ver} released under {license} license.".format(ver=__version__, license=__license__.upper()))
+    parser.add_argument(
+        "--author",
+        action="version",
+        help="show info of program's author",
+        version="Author: 王诗翔 Email: w_shixiang@163.com GitHub: @{author}".format(author=__author__))
 
     # Common arguments
     host_parent_parser = argparse.ArgumentParser(add_help=False)
@@ -59,7 +64,8 @@ def parse_args(args):
       type = int,
       default=22)
 
-    host_parent_parser.add_argument(
+    verbose_parser = argparse.ArgumentParser(add_help=False)
+    verbose_parser.add_argument(
       "-v",
       "--verbose",
       dest="loglevel",
@@ -78,7 +84,7 @@ def parse_args(args):
     parser_add = subparsers.add_parser(
       'add',
       help="Add a remote host",
-      parents=[host_parent_parser])
+      parents=[host_parent_parser, verbose_parser])
     parser_add.add_argument(
       '-A',
       '--active',
@@ -90,25 +96,32 @@ def parse_args(args):
     parser_del = subparsers.add_parser(
       'delete',
       help="Delete a remote host",
-      parents=[host_parent_parser])
+      parents=[host_parent_parser, verbose_parser])
 
     # Create the parser for the "switch" command
     parser_switch = subparsers.add_parser(
       'switch',
       help="Switch active remote host",
-      parents=[host_parent_parser])
+      parents=[host_parent_parser, verbose_parser])
 
     # Create the parser for the "list" command
     parser_list = subparsers.add_parser(
       'list',
-      help="List all remote hosts")
-    parser_list.add_argument(
-      "-v",
-      "--verbose",
-      dest="loglevel",
-      help="set loglevel to INFO",
-      action="store_const",
-      const=logging.INFO)
+      help="List all remote hosts",
+      parents=[verbose_parser])
+
+    # Create the parser for the "run" command
+    parser_run = subparsers.add_parser(
+      'run',
+      help='Run commands on the active remote host',
+      parents=[verbose_parser]
+    )
+    parser_run.add_argument(
+      nargs='+',
+      dest='commands',
+      help="Commands to run, special symbol or option should be quoted, e.g. 'ls ~', 'ls -l'",
+      type=str
+    )
 
     return parser.parse_args(args), parser
 
@@ -168,7 +181,9 @@ def main(args):
     elif args.subparsers_name == 'list':
       _logger.info("List command is detected.")
       host.list()
-
+    elif args.subparsers_name == 'run':
+      _logger.info("Run command is detected.")
+      host.cmd(" ".join(args.commands))
 
     _logger.info("loon ends here")
 

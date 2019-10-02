@@ -129,9 +129,15 @@ class Host:
         """Run command(s) in active remote host"""
         self.connect()
         self.session.execute(commands)
-        datalist = []
-        try:
+
+        size, errinfo = self.session.read_stderr()
+        if size > 0:
+            print('An error is raised by remote host, please read the info:\n')
+            print(errinfo.decode('utf-8'), end="")
+            sys.exit(1)
+        else:
             # Get output
+            datalist = []
             size, data = self.session.read()
             # Here data is byte type
             while size > 0:
@@ -139,12 +145,6 @@ class Host:
                 print(data, end='')
                 datalist.append(data)
                 size, data = self.session.read()
-        except Exception as e:
-            # Get exit status
-            print("Exit status: %s" % self.session.get_exit_status())
-            print("Error info:\n%r" %e)
-        # finally:
-        #     self.session.close()
         
         # Return a list containing output from commands 
         return datalist
