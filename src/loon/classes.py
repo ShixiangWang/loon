@@ -169,7 +169,7 @@ class Host:
             info = os.stat(i)
             print("Uploading %s to %s" %(i, destination[0]))
             print(info)
-            chan = self.session.scp_send(
+            chan = self.session.scp_send64(
                 destination[0],
                 info.st_mode & 0o777,
                 info.st_size,
