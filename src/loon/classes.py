@@ -167,10 +167,10 @@ class Host:
         now = datetime.now()
         for i in source:
             info = os.stat(i)
-            print("Uploading %s to %s" %(i, destination[0]))
-            print(info)
+            print("Uploading %s to %s" %(i, destination))
+            destination = '/'.join([destination, os.path.basename(i)])
             chan = self.session.scp_send64(
-                destination[0],
+                destination,
                 info.st_mode & 0o777,
                 info.st_size,
                 info.st_mtime,

@@ -132,12 +132,10 @@ def parse_args(args):
     parser_upload.add_argument(
       'source',
       nargs='+',
-      help='Source files to upload',
-      type=str
+      help='Source files to upload'
     )
     parser_upload.add_argument(
       'destination',
-      nargs=1,
       help="Remote destination directory, Note'~' should be quoted",
       type=str
     )
@@ -205,8 +203,6 @@ def main(args):
       host.cmd(" ".join(args.commands))
     elif args.subparsers_name == 'upload':
       _logger.info("Upload command is detected.")
-      print(args.source)
-      print(args.destination)
       host.connect(open_channel=False)
       host.upload(args.source, args.destination)
 
