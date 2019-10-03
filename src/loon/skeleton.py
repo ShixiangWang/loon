@@ -49,20 +49,24 @@ def parse_args(args):
       '-U', '--username',
       dest='username',
       help='Username for remote host',
-      type = str, 
-      required=True)
+      type = str)
     host_parent_parser.add_argument(
       '-H', '--host',
       dest='host',
       help='IP address for remote host (e.g. 192.168.0.1)',
-      type = str,
-      required=True)
+      type = str)
     host_parent_parser.add_argument(
       '-P', '--port',
       dest="port",
       help='Port for remote host, default is 22', 
       type = int,
       default=22)
+    host_parent_parser.add_argument(
+      '-N', '--name',
+      dest="name",
+      help='Custom host name, default is value from -U',
+      type = str
+    )
 
     verbose_parser = argparse.ArgumentParser(add_help=False)
     verbose_parser.add_argument(
@@ -174,12 +178,19 @@ def main(args):
     # Deparse arguments
     if args.subparsers_name == 'add':
       _logger.info("Add command is detected.")
+      if args.username is None or args.host is None:
+        print("Error: username and host are both required in add command.")
+        sys.exit(1)
+      if args.name is None:
+        args.name = args.username
       host.add(
+        name = args.name,
         username=args.username,
         host=args.host,
         port=args.port)
       if args.switch_active:
         host.switch(
+          name = args.name,
           username=args.username,
           host=args.host,
           port=args.port)

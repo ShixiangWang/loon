@@ -48,9 +48,9 @@ class Host:
             json.dump(hosts, f)
         return
 
-    def add(self, username, host, port=22):
+    def add(self, name, username, host, port=22):
         """Add a remote host"""
-        info = [username, host, port]
+        info = [name, username, host, port]
 
         if info in self.available_hosts:
             print("=> Input host exists. Will not change.")
@@ -63,9 +63,9 @@ class Host:
             print("=> Added successfully!")
         return
 
-    def delete(self, username, host, port=22):
+    def delete(self, name, username, host, port=22):
         """Delete a remote host"""
-        info = [username, host, port]
+        info = [name, username, host, port]
         if info in self.available_hosts:
             print("=> Removing host from available list...")
             self.available_hosts.remove(info)
@@ -83,9 +83,9 @@ class Host:
             print("=> Host does not exist, please check input with hostlist command!")
         return
     
-    def switch(self, username, host, port=22):
+    def switch(self, name, username, host, port=22):
         """Switch active host"""
-        info = [username, host, port]
+        info = [name, username, host, port]
         if info in self.available_hosts:
             self.active_host = info
             self.save_hosts()
