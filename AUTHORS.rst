@@ -2,4 +2,4 @@
 Contributors
 ============
 
-* ShixiangWang <wangshx@shanghaitech.edu.cn>
+* ShixiangWang <w_shixiang@163.com>
