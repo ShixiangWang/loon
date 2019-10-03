@@ -122,6 +122,25 @@ def parse_args(args):
       help="Commands to run, special symbol or option should be quoted, e.g. 'ls ~', 'ls -l'",
       type=str
     )
+    
+    # Create the parser for the "upload" command
+    parser_upload = subparsers.add_parser(
+      'upload',
+      help='Upload files to active remote host',
+      parents=[verbose_parser]
+    )
+    parser_upload.add_argument(
+      'source',
+      nargs='+',
+      help='Source files to upload',
+      type=str
+    )
+    parser_upload.add_argument(
+      'destination',
+      nargs=1,
+      help="Remote destination directory, Note'~' should be quoted",
+      type=str
+    )
 
     return parser.parse_args(args), parser
 
@@ -184,6 +203,12 @@ def main(args):
     elif args.subparsers_name == 'run':
       _logger.info("Run command is detected.")
       host.cmd(" ".join(args.commands))
+    elif args.subparsers_name == 'upload':
+      _logger.info("Upload command is detected.")
+      print(args.source)
+      print(args.destination)
+      host.connect(open_channel=False)
+      host.upload(args.source, args.destination)
 
     _logger.info("loon ends here")
 

@@ -6,6 +6,7 @@ import os
 import json
 import pprint
 import socket
+from datetime import datetime
 from ssh2.session import Session
 if __package__ == '' or __package__ is None:  # Use for test
     from __init__ import __host_file__
@@ -108,7 +109,7 @@ class Host:
         pp.pprint(self.available_hosts)
         return
     
-    def connect(self, privatekey_file="~/.ssh/id_rsa", passphrase=''):
+    def connect(self, privatekey_file="~/.ssh/id_rsa", passphrase='', open_channel=True):
         """Connect active host and open a session"""
         privatekey_file = os.path.expanduser(privatekey_file)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -122,15 +123,22 @@ class Host:
             # Use password to auth
             passwd = input('No private key found.\nEnter your password for %s: ' %self.active_host[0])
             s.userauth_password(self.active_host[0], passwd)
-        self.session = s.open_session()
+        self.session = s
+        if open_channel:
+            self.channel = self.session.open_session()
         return
     
     def cmd(self, commands):
-        """Run command(s) in active remote host"""
-        self.connect()
-        self.session.execute(commands)
+        """Run command(s) in active remote host using channel session
+        Therefore, `open_channel` in `connect` method must be `True` before using it.
 
-        size, errinfo = self.session.read_stderr()
+        Args:
+            commands ([str]): commands run on active remote host
+        """
+        self.connect()
+        self.channel.execute(commands)
+
+        size, errinfo = self.channel.read_stderr()
         if size > 0:
             print('An error is raised by remote host, please read the info:\n')
             print(errinfo.decode('utf-8'), end="")
@@ -138,20 +146,44 @@ class Host:
         else:
             # Get output
             datalist = []
-            size, data = self.session.read()
+            size, data = self.channel.read()
             # Here data is byte type
             while size > 0:
                 data = data.decode('utf-8')
                 print(data, end='')
                 datalist.append(data)
-                size, data = self.session.read()
+                size, data = self.channel.read()
         
         # Return a list containing output from commands 
         return datalist
 
-    def upload(self):
-        """Upload files to active remote host"""
-        pass
+    def upload(self, source, destination):
+        """Upload files to active remote host
+        Args:
+            source [(list)]: list of files (directories) to remote host
+            destination [(str)]: destination directory
+        """
+        print("Starting upload...")
+        now = datetime.now()
+        for i in source:
+            info = os.stat(i)
+            print("Uploading %s to %s" %(i, destination[0]))
+            print(info)
+            chan = self.session.scp_send(
+                destination[0],
+                info.st_mode & 0o777,
+                info.st_size,
+                info.st_mtime,
+                info.st_atime
+            )
+            with open(i, 'rb') as local_fh:
+                for data in local_fh:
+                    chan.write(data)
+        taken = datetime.now() - now
+        print("Finished uploading in %s" %taken)
+        return
+     
+        
     def download(self):
         """Download files to local machine from active remote host"""
         pass
