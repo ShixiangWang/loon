@@ -1,8 +1,7 @@
-# loon
+# loon - A Python toolkit for operating remote host based on SSH.
 
-![GitHub repo size](https://img.shields.io/github/repo-size/ShixiangWang/loon) ![PyPI](https://img.shields.io/pypi/v/loon?color=blue) ![PyPI - Downloads](https://img.shields.io/pypi/dm/loon) ![GitHub All Releases](https://img.shields.io/github/downloads/ShixiangWang/loon/total) ![GitHub issues](https://img.shields.io/github/issues-raw/ShixiangWang/loon) ![GitHub last commit](https://img.shields.io/github/last-commit/ShixiangWang/loon)
+![GitHub repo size](https://img.shields.io/github/repo-size/ShixiangWang/loon) ![PyPI](https://img.shields.io/pypi/v/loon?color=blue) [![Documentation Status](https://readthedocs.org/projects/loon/badge/?version=latest)](https://loon.readthedocs.io/en/latest/?badge=latest) ![PyPI - Downloads](https://img.shields.io/pypi/dm/loon) ![GitHub All Releases](https://img.shields.io/github/downloads/ShixiangWang/loon/total) ![GitHub issues](https://img.shields.io/github/issues-raw/ShixiangWang/loon) ![GitHub last commit](https://img.shields.io/github/last-commit/ShixiangWang/loon) 
 
-A Python toolkit for operating remote host based on SSH.
 
 ## Description
 
