@@ -34,6 +34,27 @@ class Host:
                 hosts = json.load(f)
             self.active_host = hosts['active']
             self.available_hosts = hosts['available']
+
+        if any(isinstance(i, list) for i in self.active_host):
+            print("Error: more than one active host. Please check config file ~/.config/loon/host.json and modify or remove it if necessary.")
+
+        # Python code to remove duplicate elements 
+        def RemoveDups(duplicate): 
+            final_list = [] 
+            flag = False
+            for num in duplicate: 
+                if num not in final_list: 
+                    final_list.append(num) 
+                else: 
+                    flag = True
+            return final_list, flag
+        
+        self.available_hosts, flag = RemoveDups(self.available_hosts)
+        
+        if flag:
+            # Save unique hosts immediately
+            self.save_hosts()
+
         return
 
     def save_hosts(self):
@@ -63,36 +84,61 @@ class Host:
             print("=> Added successfully!")
         return
 
+    def host_check(self, name, username, host, port=22):
+        host = []
+        if name is not None:
+            for h in self.available_hosts:
+                if h[0] == name:
+                    host = h.copy()
+        else:
+            info = [username, host, port]
+            for h in self.available_hosts:
+                if h[1:] == info:
+                    host = h.copy()
+        if len(host) == 0:
+            print("=> Host does not exist, please check input with list command!")
+            sys.exit(1)
+        return host
+
     def delete(self, name, username, host, port=22):
         """Delete a remote host"""
-        info = [name, username, host, port]
-        if info in self.available_hosts:
-            print("=> Removing host from available list...")
-            self.available_hosts.remove(info)
-            if info == self.active_host:
-                print("=> Removing active host...")
-                if len(self.available_hosts) > 0:
-                    self.active_host = self.available_hosts[0]
-                    print("=> Changing active host to %s" %self.active_host)
-                else:
-                    self.active_host = []  # reset
-                    print("=> Reseting active host to []")
-            self.save_hosts()
-            print("=> Deleted.")
-        else:
-            print("=> Host does not exist, please check input with hostlist command!")
+        host2del = self.host_check(name, username, host, port)
+        print("=> Removing host from available list...")
+        self.available_hosts.remove(host2del)
+        if host2del == self.active_host:
+            print("=> Removing active host...")
+            if len(self.available_hosts) > 0:
+                self.active_host = self.available_hosts[0]
+                print("=> Changing active host to %s" %self.active_host[0])
+            else:
+                self.active_host = []  # reset
+                print("=> Reseting active host to []")
+        self.save_hosts()
         return
     
     def switch(self, name, username, host, port=22):
         """Switch active host"""
-        info = [name, username, host, port]
-        if info in self.available_hosts:
-            self.active_host = info
-            self.save_hosts()
-            print("=> Activated.")
-        else:
-            print("Host does not exist, please check input with hostlist command!")
+        host2switch = self.host_check(name, username, host, port)
+        self.active_host = host2switch
+        self.save_hosts()
+        print("=> Activated.")
         return
+
+    def rename(self, old, new):
+        """Rename host name"""
+        host2rename = []        
+        for index, h in enumerate(self.available_hosts):
+            if h[0] == old:
+                host2rename = h.copy()
+                self.available_hosts[index][0] = new
+        if len(host2rename) == 0:
+            print("=> Host does not exist, please check input with list command!")
+            sys.exit(1)
+        if host2rename == self.active_host:
+            self.active_host[0] = new
+        self.save_hosts()
+        return
+        
         
     def list(self):
         """List all remote hosts"""
@@ -113,16 +159,16 @@ class Host:
         """Connect active host and open a session"""
         privatekey_file = os.path.expanduser(privatekey_file)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((self.active_host[1], self.active_host[2]))
+        sock.connect((self.active_host[2], self.active_host[3]))
         s = Session()
         s.handshake(sock)
         try:
             # Try using private key file first
-            s.userauth_publickey_fromfile(self.active_host[0], privatekey_file, passphrase)
+            s.userauth_publickey_fromfile(self.active_host[1], privatekey_file, passphrase)
         except:
             # Use password to auth
-            passwd = input('No private key found.\nEnter your password for %s: ' %self.active_host[0])
-            s.userauth_password(self.active_host[0], passwd)
+            passwd = input('No private key found.\nEnter your password for %s: ' %self.active_host[1])
+            s.userauth_password(self.active_host[1], passwd)
         self.session = s
         if open_channel:
             self.channel = self.session.open_session()

@@ -46,6 +46,12 @@ def parse_args(args):
     # Common arguments
     host_parent_parser = argparse.ArgumentParser(add_help=False)
     host_parent_parser.add_argument(
+      '-N', '--name',
+      dest="name",
+      help='Host alias, default is value from -U',
+      type = str
+    )
+    host_parent_parser.add_argument(
       '-U', '--username',
       dest='username',
       help='Username for remote host',
@@ -61,12 +67,7 @@ def parse_args(args):
       help='Port for remote host, default is 22', 
       type = int,
       default=22)
-    host_parent_parser.add_argument(
-      '-N', '--name',
-      dest="name",
-      help='Custom host name, default is value from -U',
-      type = str
-    )
+
 
     verbose_parser = argparse.ArgumentParser(add_help=False)
     verbose_parser.add_argument(
@@ -113,6 +114,22 @@ def parse_args(args):
       'list',
       help="List all remote hosts",
       parents=[verbose_parser])
+    
+    # Create the parser for the "rename" command
+    parser_rename = subparsers.add_parser(
+      'rename',
+      help="Rename host alias",
+      parents=[verbose_parser])
+    parser_rename.add_argument(
+      'old',
+      help="Old host alias",
+      type=str
+    )
+    parser_rename.add_argument(
+      'new',
+      help="New host alias",
+      type=str
+    )
 
     # Create the parser for the "run" command
     parser_run = subparsers.add_parser(
@@ -184,31 +201,44 @@ def main(args):
       if args.name is None:
         args.name = args.username
       host.add(
-        name = args.name,
+        name=args.name,
         username=args.username,
         host=args.host,
         port=args.port)
       if args.switch_active:
         host.switch(
-          name = args.name,
+          name=args.name,
           username=args.username,
           host=args.host,
           port=args.port)
     elif args.subparsers_name == 'delete':
       _logger.info("Delete command is detected.")
+      if args.username is None or args.host is None:
+        if args.name is None:
+          print("Error: either specify name or both username and host")
+          sys.exit(1)
       host.delete(
+        name=args.name,
         username=args.username,
         host=args.host,
         port=args.port)
     elif args.subparsers_name == 'switch':
       _logger.info("Switch command is detected.")
+      if args.username is None or args.host is None:
+        if args.name is None:
+          print("Error: either specify name or both username and host")
+          sys.exit(1)
       host.switch(
+        name=args.name,
         username=args.username,
         host=args.host,
         port=args.port)
     elif args.subparsers_name == 'list':
       _logger.info("List command is detected.")
       host.list()
+    elif args.subparsers_name == 'rename':
+      _logger.info("Rename command is detected.")
+      host.rename(args.old, args.new)
     elif args.subparsers_name == 'run':
       _logger.info("Run command is detected.")
       host.cmd(" ".join(args.commands))
