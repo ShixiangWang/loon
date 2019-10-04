@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.1.5
+=============
+
+- Useless badge removed in README
+- A pretty table function added to list hosts
+
 Version 0.1.4
 =============
 
