@@ -1,6 +1,6 @@
-# loon - A Python toolkit for operating remote host based on SSH.
+# loon - A Python toolkit for operating remote host based on SSH
 
-![GitHub repo size](https://img.shields.io/github/repo-size/ShixiangWang/loon) ![PyPI](https://img.shields.io/pypi/v/loon?color=blue) [![Documentation Status](https://readthedocs.org/projects/loon/badge/?version=latest)](https://loon.readthedocs.io/en/latest/?badge=latest) ![PyPI - Downloads](https://img.shields.io/pypi/dm/loon) ![GitHub All Releases](https://img.shields.io/github/downloads/ShixiangWang/loon/total) ![GitHub issues](https://img.shields.io/github/issues-raw/ShixiangWang/loon) ![GitHub last commit](https://img.shields.io/github/last-commit/ShixiangWang/loon) 
+![GitHub repo size](https://img.shields.io/github/repo-size/ShixiangWang/loon) ![PyPI](https://img.shields.io/pypi/v/loon?color=blue) [![Documentation Status](https://readthedocs.org/projects/loon/badge/?version=latest)](https://loon.readthedocs.io/en/latest/?badge=latest) ![PyPI - Downloads](https://img.shields.io/pypi/dm/loon) ![GitHub issues](https://img.shields.io/github/issues-raw/ShixiangWang/loon) ![GitHub last commit](https://img.shields.io/github/last-commit/ShixiangWang/loon) 
 
 
 ## Description
@@ -35,33 +35,29 @@ $ loon add -U wsx -H 127.0.0.2 -N host2
 
 ```shell
 $ loon list
-
-Active host
-============
-['wsx', 'wsx', '127.0.0.1', 22]
-
-Available hosts
-===============
-[['wsx', 'wsx', '127.0.0.1', 22],
- ['host2', 'wsx', '127.0.0.2', 22]]
++-----+--------+----------+----+
+|Alias|Username|IP address|Port|
++-----+--------+----------+----+
+|<wsx>|wsx     |127.0.0.1 |22  |
++-----+--------+----------+----+
+|host2|wsx     |127.0.0.2 |22  |
++-----+--------+----------+----+
+<active host>
 ```
-
-The list is ordered by `host alias`, `username`, `ip` and `port`.
 
 - Rename alias
 
 ```shell
 $ loon rename wsx host1
 $ loon list
-
-Active host
-============
-['host1', 'wsx', '127.0.0.1', 22]
-
-Available hosts
-===============
-[['host1', 'wsx', '127.0.0.1', 22],
- ['host2', 'wsx', '127.0.0.2', 22]]
++-------+--------+----------+----+
+|Alias  |Username|IP address|Port|
++-------+--------+----------+----+
+|<host1>|wsx     |127.0.0.1 |22  |
++-------+--------+----------+----+
+|host2  |wsx     |127.0.0.2 |22  |
++-------+--------+----------+----+
+<active host>
 ```
 
 - Switch active remote host
@@ -70,15 +66,14 @@ Available hosts
 $ loon switch -N host2
 => Activated.
 $ loon list
-
-Active host
-============
-['host2', 'wsx', '127.0.0.2', 22]
-
-Available hosts
-===============
-[['host1', 'wsx', '127.0.0.1', 22],
- ['host2', 'wsx', '127.0.0.2', 22]]
++-------+--------+----------+----+
+|Alias  |Username|IP address|Port|
++-------+--------+----------+----+
+|host1  |wsx     |127.0.0.1 |22  |
++-------+--------+----------+----+
+|<host2>|wsx     |127.0.0.2 |22  |
++-------+--------+----------+----+
+<active host>
 ```
 
 - Delete a host
@@ -89,14 +84,12 @@ $ loon delete -N host2
 => Removing active host...
 => Changing active host to host1
 $ loon list
-
-Active host
-============
-['host1', 'wsx', '127.0.0.1', 22]
-
-Available hosts
-===============
-[['host1', 'wsx', '127.0.0.1', 22]]
++-------+--------+----------+----+
+|Alias  |Username|IP address|Port|
++-------+--------+----------+----+
+|<host1>|wsx     |127.0.0.1 |22  |
++-------+--------+----------+----+
+<active host>
 ```
 
 ### Common tasks

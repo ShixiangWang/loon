@@ -4,16 +4,15 @@
 import sys
 import os
 import json
-import pprint
 import socket
 from datetime import datetime
 from ssh2.session import Session
 if __package__ == '' or __package__ is None:  # Use for test
     from __init__ import __host_file__
-    from utils import create_parentdir, isfile, isdir
+    from utils import create_parentdir, isfile, isdir, pretty_table
 else:
     from loon import __host_file__
-    from loon.utils import create_parentdir, isfile, isdir    
+    from loon.utils import create_parentdir, isfile, isdir, pretty_table
 
 class Host:
     """
@@ -143,16 +142,13 @@ class Host:
     def list(self):
         """List all remote hosts"""
 
-        #TODO Create a pretty table for showing list
-        pp = pprint.PrettyPrinter(width=40)
-        print()
-        print("Active host")
-        print("="*12)
-        print("%s" %self.active_host)
-        print()
-        print("Available hosts")
-        print("="*15)
-        pp.pprint(self.available_hosts)
+        title = ['Alias', 'Username', 'IP address', 'Port']
+        content = self.available_hosts.copy()
+        for host in content:
+            if host == self.active_host:
+                host[0] = '<'+host[0]+'>'
+        pretty_table(title, content)
+        print("<active host>")
         return
     
     def connect(self, privatekey_file="~/.ssh/id_rsa", passphrase='', open_channel=True):
