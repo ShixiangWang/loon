@@ -10,7 +10,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   README <readme>
+   README <../readme>
    License <license>
    Authors <authors>
    Changelog <changelog>
