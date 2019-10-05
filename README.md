@@ -17,6 +17,22 @@ pip install loon
 
 ## Usage
 
+### Configuration
+
+To access remote host without typing password, you have to generate ssh key with `ssh-keygen` command if it is not available.
+
+```shell
+$ ssh-keygen
+```
+
+Follow the commands, for simplicity, just type `ENTER` to proceed.
+
+Copy your key to remote server, replace `user` with your `username` and `host` with your remote host ip address.
+
+```shell
+$ ssh-copy-id -i ~/.ssh/id_rsa user@host
+```
+
 ### Host management
 
 - Add a remote host
