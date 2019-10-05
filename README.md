@@ -1,6 +1,6 @@
 # loon - A Python toolkit for operating remote host based on SSH
 
-![GitHub repo size](https://img.shields.io/github/repo-size/ShixiangWang/loon) ![PyPI](https://img.shields.io/pypi/v/loon?color=blue) [![Documentation Status](https://readthedocs.org/projects/loon/badge/?version=latest)](https://loon.readthedocs.io/en/latest/?badge=latest) ![PyPI - Downloads](https://img.shields.io/pypi/dm/loon) ![GitHub issues](https://img.shields.io/github/issues-raw/ShixiangWang/loon) ![GitHub last commit](https://img.shields.io/github/last-commit/ShixiangWang/loon) 
+![GitHub repo size](https://img.shields.io/github/repo-size/ShixiangWang/loon) [![PyPI](https://img.shields.io/pypi/v/loon?color=blue)](https://pypi.org/project/loon/) [![Documentation Status](https://readthedocs.org/projects/loon/badge/?version=latest)](https://loon.readthedocs.io/en/latest/?badge=latest) ![PyPI - Downloads](https://img.shields.io/pypi/dm/loon) [![GitHub issues](https://img.shields.io/github/issues-raw/ShixiangWang/loon)](https://github.com/ShixiangWang/loon/issues?q=is%3Aopen+is%3Aissue) [![GitHub last commit](https://img.shields.io/github/last-commit/ShixiangWang/loon)](https://github.com/ShixiangWang/loon/commits/master) 
 
 
 ## Description
@@ -16,6 +16,22 @@ pip install loon
 ```
 
 ## Usage
+
+### Configuration
+
+To access remote host without typing password, you have to generate ssh key with `ssh-keygen` command if it is not available.
+
+```shell
+$ ssh-keygen
+```
+
+Follow the commands, for simplicity, just type `ENTER` to proceed.
+
+Copy your key to remote server, replace `user` with your `username` and `host` with your remote host ip address.
+
+```shell
+$ ssh-copy-id -i ~/.ssh/id_rsa user@host
+```
 
 ### Host management
 
