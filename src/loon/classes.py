@@ -206,21 +206,53 @@ class Host:
             destination [(str)]: destination directory
         """
         print("Starting upload...")
-        now = datetime.now()
-        for i in source:
-            info = os.stat(i)
-            print("Uploading %s to %s" %(i, destination))
-            destination = '/'.join([destination, os.path.basename(i)])
-            chan = self.session.scp_send64(
+        now = datetime.now()        
+
+        def _upload(self, f, destination):
+            info = os.stat(f)
+            destination = '/'.join([destination, os.path.basename(f)])
+            print("Uploading %s to %s" %(f, destination))
+
+            print(info)
+            print(info.st_mode)
+            print(info.st_size)
+            print(info.st_mtime)
+            print(info.st_atime)
+
+            # chan = self.session.scp_send64(
+            #     destination,
+            #     info.st_mode & 0o777,
+            #     info.st_size,
+            #     info.st_mtime,
+            #     info.st_atime
+            # )
+
+            chan = self.session.scp_send(
                 destination,
-                info.st_mode & 0o777,
-                info.st_size,
-                info.st_mtime,
-                info.st_atime
+                info.st_mode,
+                info.st_size
             )
-            with open(i, 'rb') as local_fh:
+
+            with open(f, 'rb') as local_fh:
                 for data in local_fh:
                     chan.write(data)
+            return
+        
+        def recur_paths(self, source, destination):
+            for f in source:
+                if isfile(f):
+                    _upload(self, f, destination)
+                elif isdir(f):
+                    fs = os.listdir(f)
+                    fs = [os.path.join(f, x) for x in fs]
+                    new_dest = os.path.join(destination, f)
+                    self.cmd("mkdir -p {0}".format(new_dest))
+                    recur_paths(self, fs, new_dest)
+                else:
+                    pass
+            return
+
+        recur_paths(self, source, destination)
         taken = datetime.now() - now
         print("Finished uploading in %s" %taken)
         return
