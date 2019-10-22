@@ -140,7 +140,7 @@ def parse_args(args):
     parser_run.add_argument(
       nargs='+',
       dest='commands',
-      help="Commands to run, special symbol or option should be quoted, e.g. 'ls ~', 'ls -l'",
+      help="Commands to run, special symbol or option should be quoted, e.g. 'ls -l ~', 'ls -l'",
       type=str
     )
     
@@ -157,7 +157,24 @@ def parse_args(args):
     )
     parser_upload.add_argument(
       'destination',
-      help="Remote destination directory, Note'~' should be quoted",
+      help="Remote destination directory, note '~' should be quoted in some cases",
+      type=str
+    )
+
+    # Create the parser for the "upload" command
+    parser_download = subparsers.add_parser(
+      'download',
+      help='Download files from active remote host',
+      parents=[verbose_parser]
+    )
+    parser_download.add_argument(
+      'source',
+      nargs='+',
+      help='Source files to download'
+    )
+    parser_download.add_argument(
+      'destination',
+      help="Local destination directory, note '~' should be quoted in some cases",
       type=str
     )
 
@@ -244,8 +261,12 @@ def main(args):
       host.cmd(" ".join(args.commands))
     elif args.subparsers_name == 'upload':
       _logger.info("Upload command is detected.")
-      host.connect(open_channel=False)
-      host.upload(args.source, args.destination)
+      #host.connect(open_channel=False)
+      host.upload(args.source, args.destination, _logger=_logger)
+    elif args.subparsers_name == 'download':
+      _logger.info("Download command is detected.")
+      #host.connect(open_channel=False)
+      host.download(args.source, args.destination, _logger=_logger)
 
     _logger.info("loon ends here")
 

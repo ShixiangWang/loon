@@ -5,6 +5,7 @@ import sys
 import os
 import json
 import socket
+from subprocess import run, PIPE
 from datetime import datetime
 from ssh2.session import Session
 if __package__ == '' or __package__ is None:  # Use for test
@@ -152,7 +153,7 @@ class Host:
         return
     
     def connect(self, privatekey_file="~/.ssh/id_rsa", passphrase='', open_channel=True):
-        """Connect active host and open a session"""
+        """Connect active host and open a session."""
         privatekey_file = os.path.expanduser(privatekey_file)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((self.active_host[2], self.active_host[3]))
@@ -199,68 +200,45 @@ class Host:
         # Return a list containing output from commands 
         return datalist
 
-    def upload(self, source, destination):
-        """Upload files to active remote host
+    def upload(self, source, destination, _logger):
+        """Upload files to active remote host.
+
+        Currently, it is dependent on scp command.
+
         Args:
-            source [(list)]: list of files (directories) to remote host
-            destination [(str)]: destination directory
+            source [(list)]: list of files (directories) in local machine
+            destination [(str)]: destination directory in remote host
         """
-        print("Starting upload...")
-        now = datetime.now()        
-
-        def _upload(self, f, destination):
-            info = os.stat(f)
-            destination = '/'.join([destination, os.path.basename(f)])
-            print("Uploading %s to %s" %(f, destination))
-
-            print(info)
-            print(info.st_mode)
-            print(info.st_size)
-            print(info.st_mtime)
-            print(info.st_atime)
-
-            # chan = self.session.scp_send64(
-            #     destination,
-            #     info.st_mode & 0o777,
-            #     info.st_size,
-            #     info.st_mtime,
-            #     info.st_atime
-            # )
-
-            chan = self.session.scp_send(
-                destination,
-                info.st_mode,
-                info.st_size
-            )
-
-            with open(f, 'rb') as local_fh:
-                for data in local_fh:
-                    chan.write(data)
-            return
-        
-        def recur_paths(self, source, destination):
-            for f in source:
-                if isfile(f):
-                    _upload(self, f, destination)
-                elif isdir(f):
-                    fs = os.listdir(f)
-                    fs = [os.path.join(f, x) for x in fs]
-                    new_dest = os.path.join(destination, f)
-                    self.cmd("mkdir -p {0}".format(new_dest))
-                    recur_paths(self, fs, new_dest)
-                else:
-                    pass
-            return
-
-        recur_paths(self, source, destination)
+        username, host, port = self.active_host[1:]
+        cmds = "scp -pr -P {port} {source} {username}@{host}:{destination}".format(port=port, source=' '.join(map(os.path.expanduser, source)), username=username, host=host, destination=destination)
+        print("=> Starting upload...", end="\n\n")
+        now = datetime.now()  
+        _logger.info("Running " + cmds)
+        run(cmds)
         taken = datetime.now() - now
-        print("Finished uploading in %s" %taken)
+        print("\n=> Finished uploading in %ss" %taken.seconds)
         return
      
         
-    def download(self):
-        """Download files to local machine from active remote host"""
-        pass
+    def download(self, source, destination, _logger):
+        """Download files to local machine from active remote host.
+        
+        Currently, it is dependent on scp command.
+
+        Args:
+            source [(list)]: list of files (directories) in remote host
+            destination [(str)]: destination directory in local machine
+        """
+        username, host, port = self.active_host[1:]
+        print("=> Starting downloading...", end="\n\n")
+        now = datetime.now()  
+        for i in source:
+            cmds = "scp -pr -P {port} {username}@{host}:{source} {destination}".format(port=port, source=i, username=username, host=host, destination=os.path.expanduser(destination))
+            _logger.info("==> Running " + cmds)
+            run(cmds)
+        taken = datetime.now() - now
+        print("\n=> Finished downloading in %ss" %taken.seconds)
+        return
 
 
 class PBS:
