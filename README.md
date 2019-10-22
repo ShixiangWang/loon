@@ -1,11 +1,11 @@
-# loon - A Python toolkit for operating remote host based on SSH
+# loon - A Python toolkit for operating remote host
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/ShixiangWang/loon) [![PyPI](https://img.shields.io/pypi/v/loon?color=blue)](https://pypi.org/project/loon/) [![Documentation Status](https://readthedocs.org/projects/loon/badge/?version=latest)](https://loon.readthedocs.io/en/latest/?badge=latest) ![PyPI - Downloads](https://img.shields.io/pypi/dm/loon) [![GitHub issues](https://img.shields.io/github/issues-raw/ShixiangWang/loon)](https://github.com/ShixiangWang/loon/issues?q=is%3Aopen+is%3Aissue) [![GitHub last commit](https://img.shields.io/github/last-commit/ShixiangWang/loon)](https://github.com/ShixiangWang/loon/commits/master) 
 
 
 ## Description
 
-Idea for developing **loon** comes from [sync-deploy](https://github.com/ShixiangWang/sync-deploy), which help me run commands, copy and download files on/to/from remote host. This toolkit is built on the top of [ssh2-python library](https://github.com/ParallelSSH/ssh2-python).
+**loon** is a Python toolkit for operating remote host based on SSH. Idea for developing **loon** comes from [**sync-deploy**](https://github.com/ShixiangWang/sync-deploy), which is limited by its pure bash code. Therefore, I use Python to implement it and more features will be added to it in the future.
 
 ## Installation
 
