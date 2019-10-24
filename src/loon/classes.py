@@ -5,6 +5,7 @@ import sys
 import os
 import json
 import socket
+from getpass import getpass
 from subprocess import run, PIPE
 from datetime import datetime
 from ssh2.session import Session
@@ -168,7 +169,7 @@ class Host:
             s.userauth_publickey_fromfile(self.active_host[1], privatekey_file, passphrase)
         except:
             # Use password to auth
-            passwd = input('No private key found.\nEnter your password for %s: ' %self.active_host[1])
+            passwd = getpass('No private key found.\nEnter your password for %s: ' %self.active_host[1])
             s.userauth_password(self.active_host[1], passwd)
         self.session = s
         if open_channel:

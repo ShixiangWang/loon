@@ -307,7 +307,6 @@ def main(args):
       pbs.gen_template(args.input, args.output)
     elif args.subparsers_name == 'pbscheck':
       _logger.info("pbscheck command is detected.")
-      print(args.job_id)
       pbs.check(host, args.job_id)
       
 
