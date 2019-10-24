@@ -41,6 +41,25 @@ def pretty_table(title, content):
 
     return
 
+def get_filelist(dirName):
+    """Create a list of file and sub directories names in the given directory.
+    
+    Source code from: https://thispointer.com/python-how-to-get-list-of-files-in-directory-and-sub-directories/
+    """ 
+    listOfFile = os.listdir(dirName)
+    allFiles = list()
+    # Iterate over all the entries
+    for entry in listOfFile:
+        # Create full path
+        fullPath = os.path.join(dirName, entry)
+        # If entry is a directory then get the list of files in this directory 
+        if isdir(fullPath):
+            allFiles = allFiles + get_filelist(fullPath)
+        else:
+            allFiles.append(fullPath)
+                
+    return allFiles   
+
 if __name__ == "__main__":
     # Test pretty_table
     title = ['Alias', 'Username', 'IP address', 'Port']

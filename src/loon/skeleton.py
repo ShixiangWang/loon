@@ -140,20 +140,24 @@ def parse_args(args):
     parser_run.add_argument(
       nargs='+',
       dest='commands',
-      help="Commands/scripts to run, special symbol or option should be quoted, e.g. 'ls -l ~', 'ls -l'",
-      type=str
+      help="Commands/scripts to run, special symbol or option should be quoted, e.g. 'ls -l ~', 'ls -l'"
     )
     parser_run.add_argument(
       '-f',
       '--file',
       dest='run_file',
-      help='Run scripts instead of commands.',
+      help='Run scripts instead of commands',
       action='store_true')
     parser_run.add_argument(
       '--remote',
       dest='remote_file',
-      help='Treat input as remote scripts instead of local scripts.',
+      help='Treat input as remote scripts instead of local scripts',
       action='store_true')
+    parser_run.add_argument(
+      '--dir',
+      help='Remote directory for storing local scripts. Only used when flag --file sets and --remote does not set. Default is /tmp',
+      default='/tmp'
+    )
 
     
     # Create the parser for the "upload" command
@@ -198,7 +202,7 @@ def parse_args(args):
     )
     parser_pbstemp.add_argument(
       '-i', '--input',
-      help='A template file, if not set, a default template is used.',
+      help='A template file, if not set, a default template is used',
       type=str, 
       required=False
     )
@@ -217,7 +221,7 @@ def parse_args(args):
     )
     parser_pbscheck.add_argument(
       'job_id',
-      help="ID of job, if not set, all running jobs will be returned.",
+      help="ID of job, if not set, all running jobs will be returned",
       type=str,
       nargs='?'
     )
@@ -303,10 +307,16 @@ def main(args):
       host.rename(args.old, args.new)
     elif args.subparsers_name == 'run':
       _logger.info("Run command is detected.")
+      if args.run_file:
+        commands = args.commands
+      else:
+        commands = " ".join(args.commands)
       host.cmd(
-        " ".join(args.commands), 
-        run_file,
-        remote_file)
+        commands, 
+        _logger = _logger,
+        run_file = args.run_file,
+        remote_file = args.remote_file,
+        dir = args.dir)
     elif args.subparsers_name == 'upload':
       _logger.info("Upload command is detected.")
       #host.connect(open_channel=False)

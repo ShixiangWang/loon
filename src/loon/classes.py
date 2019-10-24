@@ -5,16 +5,18 @@ import sys
 import os
 import json
 import socket
+import glob
+import re
 from getpass import getpass
 from subprocess import run, PIPE
 from datetime import datetime
 from ssh2.session import Session
 if __package__ == '' or __package__ is None:  # Use for test
     from __init__ import __host_file__
-    from utils import create_parentdir, isfile, isdir, pretty_table
+    from utils import create_parentdir, isfile, isdir, pretty_table, get_filelist
 else:
     from loon import __host_file__
-    from loon.utils import create_parentdir, isfile, isdir, pretty_table
+    from loon.utils import create_parentdir, isfile, isdir, pretty_table, get_filelist
 
 this_file = os.path.realpath(__file__)
 this_dir = os.path.dirname(this_file)
@@ -176,7 +178,7 @@ class Host:
             self.channel = self.session.open_session()
         return
     
-    def cmd(self, commands, run_file, remote_file):
+    def cmd(self, commands, _logger, run_file=False, remote_file=False, dir='/tmp'):
         """Run command(s) in active remote host using channel session
         Therefore, `open_channel` in `connect` method must be `True` before using it.
 
@@ -184,9 +186,37 @@ class Host:
             commands ([str]): commands/scripts run on active remote host
             run_file ([bool]): if `True`, run scripts instead of commands
             remote_file ([bool]): if `True`, treat input as remote scripts instead of local scripts
+            dir ([str]): Remote directory for storing local scripts
         """
-        self.connect()
-        self.channel.execute(commands)
+        #self.connect()
+        if not run_file:
+            self.channel.execute(commands)
+        else:
+            # Run scripts
+            # commands are scripts here
+            if remote_file:
+                # Run remote scripts
+                pass
+            else:
+                # Run local scripts
+                # 1) upload
+                #self.upload(commands, dir, _logger)
+                # 2) get all file names
+                filelist = []
+                for fp in commands:
+                    _logger.info("fp:%s"%fp)
+                    fs = glob.glob(fp)
+                    _logger.info("fs:%s"%fs)
+                    for f in fs:
+                        _logger.info("f:%s"%f)
+                        if isdir(f):
+                            filelist.append(get_filelist(f))
+                        else:
+                            filelist.append(f)
+                print(filelist)
+                sys.exit()
+                # 3) run them one by one
+    
 
         size, errinfo = self.channel.read_stderr()
         if size > 0:
