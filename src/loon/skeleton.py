@@ -134,15 +134,27 @@ def parse_args(args):
     # Create the parser for the "run" command
     parser_run = subparsers.add_parser(
       'run',
-      help='Run commands on the active remote host',
+      help='Run commands or scripts on the active remote host',
       parents=[verbose_parser]
     )
     parser_run.add_argument(
       nargs='+',
       dest='commands',
-      help="Commands to run, special symbol or option should be quoted, e.g. 'ls -l ~', 'ls -l'",
+      help="Commands/scripts to run, special symbol or option should be quoted, e.g. 'ls -l ~', 'ls -l'",
       type=str
     )
+    parser_run.add_argument(
+      '-f',
+      '--file',
+      dest='run_file',
+      help='Run scripts instead of commands.',
+      action='store_true')
+    parser_run.add_argument(
+      '--remote',
+      dest='remote_file',
+      help='Treat input as remote scripts instead of local scripts.',
+      action='store_true')
+
     
     # Create the parser for the "upload" command
     parser_upload = subparsers.add_parser(
@@ -291,7 +303,10 @@ def main(args):
       host.rename(args.old, args.new)
     elif args.subparsers_name == 'run':
       _logger.info("Run command is detected.")
-      host.cmd(" ".join(args.commands))
+      host.cmd(
+        " ".join(args.commands), 
+        run_file,
+        remote_file)
     elif args.subparsers_name == 'upload':
       _logger.info("Upload command is detected.")
       #host.connect(open_channel=False)

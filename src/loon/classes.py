@@ -176,12 +176,14 @@ class Host:
             self.channel = self.session.open_session()
         return
     
-    def cmd(self, commands):
+    def cmd(self, commands, run_file, remote_file):
         """Run command(s) in active remote host using channel session
         Therefore, `open_channel` in `connect` method must be `True` before using it.
 
         Args:
-            commands ([str]): commands run on active remote host
+            commands ([str]): commands/scripts run on active remote host
+            run_file ([bool]): if `True`, run scripts instead of commands
+            remote_file ([bool]): if `True`, treat input as remote scripts instead of local scripts
         """
         self.connect()
         self.channel.execute(commands)
