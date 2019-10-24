@@ -258,6 +258,8 @@ class PBS:
         """Generate a PBS template"""
         if output is None:
             output = os.path.join(os.getcwd(), 'work.pbs')
+        if isfile(output):
+            print("Warning: the output file exists, it will be overwritten.")
         if input is None:
             with open(output, 'w', encoding='utf-8') as f:
                 with open(self.tmp_header, 'r') as header:
@@ -268,6 +270,9 @@ class PBS:
                     for i in cmds:
                         print(i, file=f, end="")
         else:
+            if not isfile(input):
+                print("Error: cannot find the template file.")
+                sys.exit(1)
             with open(output, 'w', encoding='utf-8') as f:
                 with open(input, 'r') as inf:
                     for i in inf:
@@ -279,9 +284,13 @@ class PBS:
     def sub(self):
         """Submit all pbs tasks in a remote directory"""
         pass
-    def check(self):
+    def check(self, host, job_id):
         """Check PBS task status"""
-        pass
+        if job_id is None:
+            host.cmd('qstat')
+        else:
+            host.cmd('qstat ' + job_id)
+        return
 
 if __name__ == "__main__":
     print(this_dir)

@@ -8,6 +8,7 @@ Version 0.1.6
 - Implemented `upload` command
 - Added `download` command
 - Added `pbstemp` command
+- Added `pbscheck` command
 
 Version 0.1.5
 =============

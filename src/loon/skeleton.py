@@ -197,6 +197,19 @@ def parse_args(args):
       required=False
     )
 
+    # Create the parser for the "pbscheck" command
+    parser_pbscheck = subparsers.add_parser(
+      'pbscheck',
+      help='Check status of a PBS job on remote host',
+      parents=[verbose_parser]
+    )
+    parser_pbscheck.add_argument(
+      'job_id',
+      help="ID of job, if not set, all running jobs will be returned.",
+      type=str,
+      nargs='?'
+    )
+
     return parser.parse_args(args), parser
 
 
@@ -292,6 +305,10 @@ def main(args):
       print(args.input)
       print(args.output)
       pbs.gen_template(args.input, args.output)
+    elif args.subparsers_name == 'pbscheck':
+      _logger.info("pbscheck command is detected.")
+      print(args.job_id)
+      pbs.check(host, args.job_id)
       
 
     _logger.info("loon ends here")
