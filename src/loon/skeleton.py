@@ -12,10 +12,10 @@ import logging
 
 if __package__ == '' or __package__ is None:  # Use for test
   from __init__ import __version__, __author__, __license__
-  from classes import Host
+  from classes import Host, PBS
 else:
   from loon import __version__, __author__, __license__
-  from loon.classes import Host
+  from loon.classes import Host, PBS
 
 _logger = logging.getLogger(__name__)
 
@@ -178,6 +178,25 @@ def parse_args(args):
       type=str
     )
 
+    # Create the parser for the "pbstemp" command
+    parser_pbstemp = subparsers.add_parser(
+      'pbstemp',
+      help='Generate a PBS template file',
+      parents=[verbose_parser]
+    )
+    parser_pbstemp.add_argument(
+      '-i', '--input',
+      help='A template file, if not set, a default template is used.',
+      type=str, 
+      required=False
+    )
+    parser_pbstemp.add_argument(
+      '-o', '--output',
+      help="Output file, default is work.pbs",
+      type=str,
+      required=False
+    )
+
     return parser.parse_args(args), parser
 
 
@@ -208,6 +227,7 @@ def main(args):
     setup_logging(args.loglevel)
     _logger.info("Starting loon...")
     host = Host()
+    pbs = PBS()
 
     # Deparse arguments
     if args.subparsers_name == 'add':
@@ -267,6 +287,12 @@ def main(args):
       _logger.info("Download command is detected.")
       #host.connect(open_channel=False)
       host.download(args.source, args.destination, _logger=_logger)
+    elif args.subparsers_name == 'pbstemp':
+      _logger.info("pbstemp command is detected.")
+      print(args.input)
+      print(args.output)
+      pbs.gen_template(args.input, args.output)
+      
 
     _logger.info("loon ends here")
 

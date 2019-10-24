@@ -1,0 +1,6 @@
+# Set this job's working directory
+# Use `cd your_working_dir` 
+# Default is user directory
+cd ~
+
+# Following are commands/scripts you want to run

@@ -15,6 +15,10 @@ else:
     from loon import __host_file__
     from loon.utils import create_parentdir, isfile, isdir, pretty_table
 
+this_file = os.path.realpath(__file__)
+this_dir = os.path.dirname(this_file)
+data_dir = os.path.join(this_dir, 'data')
+
 class Host:
     """
     Representation of remote host
@@ -246,9 +250,30 @@ class PBS:
     Representation of PBS task
     """
     def __init__(self):
-        pass
-    def gen_template(self):
-        pass
+        self.tmp_header = os.path.join(data_dir, "PBS_HEADER.txt")
+        self.tmp_cmds = os.path.join(data_dir, "PBS_CMDS.txt")
+        return
+
+    def gen_template(self, input, output):
+        """Generate a PBS template"""
+        if output is None:
+            output = os.path.join(os.getcwd(), 'work.pbs')
+        if input is None:
+            with open(output, 'w', encoding='utf-8') as f:
+                with open(self.tmp_header, 'r') as header:
+                    for i in header:
+                        print(i, file=f, end="")
+            with open(output, 'a', encoding='utf-8') as f:
+                with open(self.tmp_cmds, 'r') as cmds:
+                    for i in cmds:
+                        print(i, file=f, end="")
+        else:
+            with open(output, 'w', encoding='utf-8') as f:
+                with open(input, 'r') as inf:
+                    for i in inf:
+                        print(i, file=f, end="")
+        return
+
     def gen_pbs(self):
         pass
     def sub(self):
@@ -259,7 +284,5 @@ class PBS:
         pass
 
 if __name__ == "__main__":
-    host = Host()
-    host.add(username="wsx", host="10.19.24.165")
-    host.list()
-    host.cmd("ls -l")
+    print(this_dir)
+    print(data_dir)
