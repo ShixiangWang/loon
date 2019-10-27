@@ -178,14 +178,15 @@ class Host:
             self.channel = self.session.open_session()
         return
     
-    def cmd(self, commands, _logger, run_file=False, remote_file=False, dir='/tmp'):
+    def cmd(self, commands, _logger, run_file=False, data_dir=None, remote_file=False, dir='/tmp'):
         """Run command(s) in active remote host using channel session
         Therefore, `open_channel` in `connect` method must be `True` before using it.
 
         Args:
             commands ([str]): commands/scripts run on active remote host
             run_file ([bool]): if `True`, run scripts instead of commands
-            remote_file ([bool]): if `True`, treat input as remote scripts instead of local scripts
+            data_dir ([str]): a path representing data directory
+            remote_file ([bool]): if `True`, collect input from remote host instead of local machine
             dir ([str]): Remote directory for storing local scripts
         """
         #self.connect()
@@ -193,12 +194,21 @@ class Host:
             self.channel.execute(commands)
         else:
             # Run scripts
+            print(commands)
+            scripts = commands
             # commands are scripts here
             if remote_file:
                 # Run remote scripts
-                pass
+                commands_1 = list(map(lambda x: 'chmod u+x '+x, scripts))
+                commands_2 = list(map(lambda x: './'+x, scripts))
+                commands_1 = ';'.join(commands_1)
+                commands_2 = ';'.join(commands_2)
+                print(commands_1 + ';' + commands_2)
+                sys.exit()
+                #self.channel.execute(commands_1 + ';' + commands_2)
             else:
                 # Run local scripts
+                #
                 # 1) upload
                 #self.upload(commands, dir, _logger)
                 # 2) get all file names

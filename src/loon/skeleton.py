@@ -149,9 +149,15 @@ def parse_args(args):
       help='Run scripts instead of commands',
       action='store_true')
     parser_run.add_argument(
+      '--data',
+      help=('Include a data directory when run local scripts'),
+      type=str, 
+      required=False
+    )
+    parser_run.add_argument(
       '--remote',
       dest='remote_file',
-      help='Treat input as remote scripts instead of local scripts',
+      help='Scripts are directly from the active remote host',
       action='store_true')
     parser_run.add_argument(
       '--dir',
@@ -315,6 +321,7 @@ def main(args):
         commands, 
         _logger = _logger,
         run_file = args.run_file,
+        data_dir = args.data,
         remote_file = args.remote_file,
         dir = args.dir)
     elif args.subparsers_name == 'upload':
