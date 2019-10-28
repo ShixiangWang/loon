@@ -178,7 +178,7 @@ class Host:
             self.channel = self.session.open_session()
         return
     
-    def cmd(self, commands, _logger, run_file=False, data_dir=None, remote_file=False, dir='/tmp'):
+    def cmd(self, commands, _logger, run_file=False, data_dir=None, remote_file=False, dir='/tmp', prog=None):
         """Run command(s) in active remote host using channel session
         Therefore, `open_channel` in `connect` method must be `True` before using it.
 
@@ -210,19 +210,24 @@ class Host:
                     self.channel.execute(commands_1)
                     scripts = self.get_result()[0].split('\n')
                     scripts.remove('')
-
-                commands_1 = list(map(lambda x: 'chmod u+x '+x, scripts))
-                #commands_2 = list(map(lambda x: 'eval '+x, scripts))
-                commands_1 = ';'.join(commands_1)
-                commands_2 = ';'.join(scripts)
-                print(commands_1 + ';' + commands_2)
+                if prog is None:
+                    commands_1 = list(map(lambda x: 'chmod u+x '+x, scripts))
+                    commands_1 = ';'.join(commands_1)
+                    commands_2 = ';'.join(scripts)
+                    commands = commands_1 + ';' + commands_2
+                else:
+                    commands = list(map(lambda x: '{} '.format(prog)+x, scripts))
+                    commands = ';'.join(commands)
+                _logger.info(commands)
                 self.connect()
-                self.channel.execute(commands_1 + ';' + commands_2)
+                self.channel.execute(commands)
             else:
                 # Run local scripts
                 #
                 # 1) upload
-                #self.upload(commands, dir, _logger)
+                self.upload(scripts, dir, _logger)
+                if data_dir is not None:
+                    self.upload(data_dir, dir, _logger)
                 # 2) get all file names
                 filelist = []
                 for fp in commands:
@@ -232,13 +237,25 @@ class Host:
                     for f in fs:
                         _logger.info("f:%s"%f)
                         if isdir(f):
-                            filelist.append(get_filelist(f))
+                            print("Warning: directory %s is detected, note anything in it will be ignored to execute." %f)
                         else:
                             filelist.append(f)
+                filelist = list(map(os.path.basename, filelist))
                 print(filelist)
-                sys.exit()
                 # 3) run them one by one
-
+                scripts = list(map(lambda x: '/'.join([dir, x]), filelist))
+                if prog is None:
+                    commands_1 = list(map(lambda x: 'chmod u+x '+x, scripts))
+                    commands_1 = ';'.join(commands_1)
+                    commands_2 = ';'.join(scripts)
+                    commands = commands_1 + ';' + commands_2
+                else:
+                    commands = list(map(lambda x: '{} '.format(prog)+x, scripts))
+                    commands = ';'.join(commands)
+                _logger.info(commands)
+                self.connect()
+                self.channel.execute(commands)
+                
         datalist = self.get_result()
         return datalist
     

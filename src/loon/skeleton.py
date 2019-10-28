@@ -164,6 +164,11 @@ def parse_args(args):
       help='Remote directory for storing local scripts. Only used when flag --file sets and --remote does not set. Default is /tmp',
       default='/tmp'
     )
+    parser_run.add_argument(
+      '--prog',
+      help='Specified program to run scripts, if not set, scripts will be executed directly assuming shbang exist',
+      required=False
+    )
 
     
     # Create the parser for the "upload" command
@@ -323,7 +328,8 @@ def main(args):
         run_file = args.run_file,
         data_dir = args.data,
         remote_file = args.remote_file,
-        dir = args.dir)
+        dir = args.dir,
+        prog = args.prog)
     elif args.subparsers_name == 'upload':
       _logger.info("Upload command is detected.")
       #host.connect(open_channel=False)
