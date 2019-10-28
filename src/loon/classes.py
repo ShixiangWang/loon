@@ -189,7 +189,7 @@ class Host:
             remote_file ([bool]): if `True`, collect input from remote host instead of local machine
             dir ([str]): Remote directory for storing local scripts
         """
-        #self.connect()
+        self.connect()
         if not run_file:
             self.channel.execute(commands)
         else:
@@ -200,12 +200,11 @@ class Host:
             if remote_file:
                 # Run remote scripts
                 commands_1 = list(map(lambda x: 'chmod u+x '+x, scripts))
-                commands_2 = list(map(lambda x: './'+x, scripts))
+                #commands_2 = list(map(lambda x: 'eval '+x, scripts))
                 commands_1 = ';'.join(commands_1)
-                commands_2 = ';'.join(commands_2)
+                commands_2 = ';'.join(scripts)
                 print(commands_1 + ';' + commands_2)
-                sys.exit()
-                #self.channel.execute(commands_1 + ';' + commands_2)
+                self.channel.execute(commands_1 + ';' + commands_2)
             else:
                 # Run local scripts
                 #
