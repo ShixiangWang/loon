@@ -189,21 +189,34 @@ class Host:
             remote_file ([bool]): if `True`, collect input from remote host instead of local machine
             dir ([str]): Remote directory for storing local scripts
         """
-        self.connect()
         if not run_file:
+            self.connect()
             self.channel.execute(commands)
         else:
             # Run scripts
-            print(commands)
+            _logger.info(commands)
             scripts = commands
             # commands are scripts here
             if remote_file:
                 # Run remote scripts
+                # Support some wildcards
+                # *,?,{}
+                wildcards = r'\*|\?|\{\}'
+                matches = [re.compile(wildcards).search(i) is not None for i in scripts]
+                if any(matches):
+                    commands_1 = list(map(lambda x: 'ls '+x, scripts))
+                    commands_1 = ';'.join(commands_1)
+                    self.connect()
+                    self.channel.execute(commands_1)
+                    scripts = self.get_result()[0].split('\n')
+                    scripts.remove('')
+
                 commands_1 = list(map(lambda x: 'chmod u+x '+x, scripts))
                 #commands_2 = list(map(lambda x: 'eval '+x, scripts))
                 commands_1 = ';'.join(commands_1)
                 commands_2 = ';'.join(scripts)
                 print(commands_1 + ';' + commands_2)
+                self.connect()
                 self.channel.execute(commands_1 + ';' + commands_2)
             else:
                 # Run local scripts
@@ -225,8 +238,12 @@ class Host:
                 print(filelist)
                 sys.exit()
                 # 3) run them one by one
-    
 
+        datalist = self.get_result()
+        return datalist
+    
+    def get_result(self, print_info=True):
+        """Get result from executed channel"""
         size, errinfo = self.channel.read_stderr()
         if size > 0:
             print('An error is raised by remote host, please read the info:\n')
@@ -239,7 +256,8 @@ class Host:
             # Here data is byte type
             while size > 0:
                 data = data.decode('utf-8')
-                print(data, end='')
+                if print_info:
+                    print(data, end='')
                 datalist.append(data)
                 size, data = self.channel.read()
         
