@@ -14,7 +14,6 @@ else
     echo 'exiting...'
     exit 1
 fi
-echo =========================
 echo 'Updating version number'
 if [ -z $py ]; then
     echo =================
@@ -37,7 +36,6 @@ fi
 echo =========================
 echo old version: $old_version
 echo new version: $new_version
-echo =========================
 sed -i '' -e "s/$old_version/$new_version/" src/loon/__init__.py
 echo ======================
 echo 'Creating new version'
@@ -56,6 +54,5 @@ echo =========================
 twine upload dist/*
 echo =========================
 echo 'Uploading release to GitHub'
-echo =========================
 git push --tags
 git push
