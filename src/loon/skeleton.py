@@ -224,10 +224,27 @@ def parse_args(args):
       required=False
     )
 
+    # Create the parser for the "pbssub" command
+    parser_pbssub = subparsers.add_parser(
+      'pbssub',
+      help='Submit PBS tasks',
+      parents=[verbose_parser]
+    )
+    parser_pbssub.add_argument(
+      nargs='+',
+      dest='tasks',
+      help="Tasks to submit, can be a directory containing only tasks"
+    )
+    parser_pbssub.add_argument(
+      '--dest',
+      help="Remote destination directory for storing tasks. Don't set it if you are using 'loon' on the remote host",
+      required=False 
+    )
+
     # Create the parser for the "pbscheck" command
     parser_pbscheck = subparsers.add_parser(
       'pbscheck',
-      help='Check status of a PBS job on remote host',
+      help='Check status of PBS job on remote host',
       parents=[verbose_parser]
     )
     parser_pbscheck.add_argument(
@@ -340,9 +357,10 @@ def main(args):
       host.download(args.source, args.destination, _logger=_logger)
     elif args.subparsers_name == 'pbstemp':
       _logger.info("pbstemp command is detected.")
-      print(args.input)
-      print(args.output)
       pbs.gen_template(args.input, args.output)
+    elif args.subparsers_name == 'pbssub':
+      _logger.info("pbssub command is detected.")
+      pbs.sub(host, args.tasks, args.dest, _logger=_logger)
     elif args.subparsers_name == 'pbscheck':
       _logger.info("pbscheck command is detected.")
       pbs.check(host, args.job_id)

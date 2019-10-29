@@ -246,8 +246,11 @@ class Host:
                         _logger.info("f:%s"%f)
                         if isdir(f):
                             print("Warning: directory %s is detected, note anything in it will be ignored to execute." %f)
-                        else:
+                        elif isfile(f):
                             filelist.append(f)
+                        else:
+                            print('Error: file %s does not exist.'%f)
+                            sys.exit(1)
                 filelist = list(map(os.path.basename, filelist))
                 _logger.info(filelist)
                 # 3) run them one by one
@@ -344,6 +347,7 @@ class PBS:
         """Generate a PBS template"""
         if output is None:
             output = os.path.join(os.getcwd(), 'work.pbs')
+        print("=> Generating %s" %output)
         if isfile(output):
             print("Warning: the output file exists, it will be overwritten.")
         if input is None:
@@ -363,13 +367,39 @@ class PBS:
                 with open(input, 'r') as inf:
                     for i in inf:
                         print(i, file=f, end="")
+        print("=> Done.")
         return
 
     def gen_pbs(self):
         pass
-    def sub(self):
-        """Submit all pbs tasks in a remote directory"""
-        pass
+
+    def sub(self, host, tasks, dest, _logger):
+        """Submit pbs tasks"""
+        if dest is None:
+            # Directly submit tasks
+            print(tasks)
+            if len(tasks)==1 and isdir(tasks[0]):
+                tasks = tasks[0] + '/*'
+            else:
+                filelist = []
+                for f in tasks:
+                    if isdir(f):
+                        print("Warning: directory %s is detected, note it will be ignored." %f)
+                    elif isfile(f):
+                        filelist.append(f)
+                    else:
+                        print('Error: file %s does not exist.'%f)
+                        sys.exit(1)
+                tasks = ' '.join(filelist)
+            _logger.info('qsub ' + tasks)
+            run('qsub ' + tasks)
+        else:
+            # Upload tasks and
+            # then submit tasks
+            host.upload(tasks, dest, _logger)
+            pass
+        return
+
     def check(self, host, job_id):
         """Check PBS task status"""
         if job_id is None:
