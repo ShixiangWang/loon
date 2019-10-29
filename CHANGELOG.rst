@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.9
+=============
+
+- Fixed typo and some config
+
 Version 0.1.7-0.1.8
 =============
 - Updated documentation

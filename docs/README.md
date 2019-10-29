@@ -7,7 +7,7 @@
 
 **loon** is a Python toolkit for operating remote host based on SSH. Idea for developing **loon** comes from [**sync-deploy**](https://github.com/ShixiangWang/sync-deploy), which is limited by its pure bash code. Therefore, I use Python to implement it and more features will be added to it in the future. 
 
-**Fore Windows users, software providing basic linux commands like `ssh` and `scp` is required, I recommend using [git bash](https://git-scm.com/downloads).**
+**For Windows users, software providing basic linux commands like `ssh` and `scp` is required, I recommend using [git bash](https://git-scm.com/downloads).**
 
 ## Installation
 
