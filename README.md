@@ -17,6 +17,12 @@ Install from pypi:
 pip install loon
 ```
 
+Install from GitHub:
+
+```bash
+pip install git+https://github.com/ShixiangWang/loon
+```
+
 ## Usage
 
 ### Configuration
