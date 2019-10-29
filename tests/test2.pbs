@@ -1,0 +1,16 @@
+#PBS -l walltime=00:01:00  # Set maximum running time
+#PBS -l nodes=1:ppn=1       # Set the number of node and CPU per node
+#PBS -S /bin/bash            # Set shell
+#PBS -l mem=2gb             # Set memory size
+#PBS -j oe                   # Output std/sterr to the same file
+#PBS -q normal_8             # Set queue name
+
+# Please set PBS arguments above
+
+# Set this job's working directory
+# Use `cd your_working_dir` 
+# Default is user directory
+cd ~
+
+# Following are commands/scripts you want to run
+echo hello world!

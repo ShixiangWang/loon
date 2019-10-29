@@ -376,39 +376,41 @@ class PBS:
     def gen_pbs(self):
         pass
 
-    def sub(self, host, tasks, remote, dest, _logger):
+    def sub(self, host, tasks, remote, _logger):
         """Submit pbs tasks"""
         print('NOTE: loon does not check if file/directory exits.')
         print('PBS file must be LF mode (Unix), not CRLF mode (Windows)')
         print('====================================================')
-        if dest is None:
-            # Directly submit tasks
-            for f in tasks:
-                _logger.info('qsub ' + f)
-                if remote:
-                    host.cmd('qsub ' + f)
-                else:
-                    run('qsub ' + f)
+        filelist = []
+        if remote:
+            tasks = ' '.join(tasks)
+            #filelist = host.cmd('ls %s'%tasks)
+            host.connect()
+            host.channel.execute('ls -p ' + tasks)
+            filelist = host.get_result(print_info=False)[0].split('\n')
+            filelist.remove('')
+            fl_bk = filelist.copy()
+            for f in fl_bk:
+                if len(f) > 1 and (f[-1]=='/' or f[-1]==':'):
+                    filelist.remove(f)
+                if f=='' or f==' ':
+                    filelist.remove(f)
+            _logger.info(filelist)
+            cmds = 'for i in {}; do qsub $i; done'.format(' '.join(filelist))
+            host.cmd(cmds, _logger=_logger)
         else:
-            # Upload tasks and
-            # then submit tasks
-            filelist = []
-            host.upload(tasks, dest, _logger)
-            for f in tasks:
-                if len(tasks) == 1 and isdir(f):
-                    cmds = dest + '/' + f + '/*'
-                    _logger.info('qsub ' + cmds)
-                    host.cmd('qsub ' + cmds)
-                    return
-                else:
+            for fp in tasks:
+                fs = glob.glob(fp)
+                for f in fs:
                     if isdir(f):
-                        print("Warning: don't support directory in this situation, skipping %s"%f)
+                        print("Warning: directory %s is detected, note anything in it will be ignored to execute." %f)
+                    elif isfile(f):
+                        filelist.append(f)
+                        run('qsub ' + f)
                     else:
-                        filelist.append(dest + '/' + os.path.basename(f))
-            cmds = ' '.join(filelist)
-            _logger.info('qsub ' + cmds)
-            host.cmd('qsub ' + cmds)
-        return
+                        print('Error: file %s does not exist.'%f)
+                        sys.exit(1)
+        return filelist
 
     def check(self, host, job_id):
         """Check PBS task status"""

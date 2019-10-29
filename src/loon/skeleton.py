@@ -236,11 +236,6 @@ def parse_args(args):
       help='PBS task files are located at the active remote host',
       action='store_true')
     parser_pbssub.add_argument(
-      '--dest',
-      help="Upload PBS files to this directory and then submit them",
-      required=False 
-    )
-    parser_pbssub.add_argument(
       nargs='+',
       dest='tasks',
       help="Tasks to submit, can be a directory containing only tasks"
@@ -366,7 +361,7 @@ def main(args):
       pbs.gen_template(args.input, args.output)
     elif args.subparsers_name == 'pbssub':
       _logger.info("pbssub command is detected.")
-      pbs.sub(host, args.tasks, args.remote_file, args.dest, _logger=_logger)
+      pbs.sub(host, args.tasks, args.remote_file, _logger=_logger)
     elif args.subparsers_name == 'pbscheck':
       _logger.info("pbscheck command is detected.")
       pbs.check(host, args.job_id)
