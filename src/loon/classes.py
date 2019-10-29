@@ -7,6 +7,7 @@ import json
 import socket
 import glob
 import re
+import io
 from getpass import getpass
 from subprocess import run, PIPE
 from datetime import datetime
@@ -178,7 +179,7 @@ class Host:
             self.channel = self.session.open_session()
         return
     
-    def cmd(self, commands, _logger, run_file=False, data_dir=None, remote_file=False, dir='/tmp', prog=None):
+    def cmd(self, commands, _logger=None, run_file=False, data_dir=None, remote_file=False, dir='/tmp', prog=None):
         """Run command(s) in active remote host using channel session
         Therefore, `open_channel` in `connect` method must be `True` before using it.
 
@@ -323,6 +324,8 @@ class Host:
             destination [(str)]: destination directory in local machine
         """
         username, host, port = self.active_host[1:]
+        if not isdir(os.path.expanduser(destination)):
+            os.makedirs(os.path.expanduser(destination))
         print("=> Starting downloading...", end="\n\n")
         now = datetime.now()  
         for i in source:
@@ -351,11 +354,11 @@ class PBS:
         if isfile(output):
             print("Warning: the output file exists, it will be overwritten.")
         if input is None:
-            with open(output, 'w', encoding='utf-8') as f:
+            with io.open(output, 'w', encoding='utf-8', newline='\n') as f:
                 with open(self.tmp_header, 'r') as header:
                     for i in header:
                         print(i, file=f, end="")
-            with open(output, 'a', encoding='utf-8') as f:
+            with io.open(output, 'a', encoding='utf-8', newline='\n') as f:
                 with open(self.tmp_cmds, 'r') as cmds:
                     for i in cmds:
                         print(i, file=f, end="")
@@ -363,7 +366,7 @@ class PBS:
             if not isfile(input):
                 print("Error: cannot find the template file.")
                 sys.exit(1)
-            with open(output, 'w', encoding='utf-8') as f:
+            with io.open(output, 'w', encoding='utf-8', newline='\n') as f:
                 with open(input, 'r') as inf:
                     for i in inf:
                         print(i, file=f, end="")
@@ -373,31 +376,38 @@ class PBS:
     def gen_pbs(self):
         pass
 
-    def sub(self, host, tasks, dest, _logger):
+    def sub(self, host, tasks, remote, dest, _logger):
         """Submit pbs tasks"""
+        print('NOTE: loon does not check if file/directory exits.')
+        print('PBS file must be LF mode (Unix), not CRLF mode (Windows)')
+        print('====================================================')
         if dest is None:
             # Directly submit tasks
-            print(tasks)
-            if len(tasks)==1 and isdir(tasks[0]):
-                tasks = tasks[0] + '/*'
-            else:
-                filelist = []
-                for f in tasks:
-                    if isdir(f):
-                        print("Warning: directory %s is detected, note it will be ignored." %f)
-                    elif isfile(f):
-                        filelist.append(f)
-                    else:
-                        print('Error: file %s does not exist.'%f)
-                        sys.exit(1)
-                tasks = ' '.join(filelist)
-            _logger.info('qsub ' + tasks)
-            run('qsub ' + tasks)
+            for f in tasks:
+                _logger.info('qsub ' + f)
+                if remote:
+                    host.cmd('qsub ' + f)
+                else:
+                    run('qsub ' + f)
         else:
             # Upload tasks and
             # then submit tasks
+            filelist = []
             host.upload(tasks, dest, _logger)
-            pass
+            for f in tasks:
+                if len(tasks) == 1 and isdir(f):
+                    cmds = dest + '/' + f + '/*'
+                    _logger.info('qsub ' + cmds)
+                    host.cmd('qsub ' + cmds)
+                    return
+                else:
+                    if isdir(f):
+                        print("Warning: don't support directory in this situation, skipping %s"%f)
+                    else:
+                        filelist.append(dest + '/' + os.path.basename(f))
+            cmds = ' '.join(filelist)
+            _logger.info('qsub ' + cmds)
+            host.cmd('qsub ' + cmds)
         return
 
     def check(self, host, job_id):

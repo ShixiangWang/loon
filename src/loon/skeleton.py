@@ -231,15 +231,21 @@ def parse_args(args):
       parents=[verbose_parser]
     )
     parser_pbssub.add_argument(
+      '--remote',
+      dest='remote_file',
+      help='PBS task files are located at the active remote host',
+      action='store_true')
+    parser_pbssub.add_argument(
+      '--dest',
+      help="Upload PBS files to this directory and then submit them",
+      required=False 
+    )
+    parser_pbssub.add_argument(
       nargs='+',
       dest='tasks',
       help="Tasks to submit, can be a directory containing only tasks"
     )
-    parser_pbssub.add_argument(
-      '--dest',
-      help="Remote destination directory for storing tasks. Don't set it if you are using 'loon' on the remote host",
-      required=False 
-    )
+
 
     # Create the parser for the "pbscheck" command
     parser_pbscheck = subparsers.add_parser(
@@ -360,12 +366,11 @@ def main(args):
       pbs.gen_template(args.input, args.output)
     elif args.subparsers_name == 'pbssub':
       _logger.info("pbssub command is detected.")
-      pbs.sub(host, args.tasks, args.dest, _logger=_logger)
+      pbs.sub(host, args.tasks, args.remote_file, args.dest, _logger=_logger)
     elif args.subparsers_name == 'pbscheck':
       _logger.info("pbscheck command is detected.")
       pbs.check(host, args.job_id)
       
-
     _logger.info("loon ends here")
 
 

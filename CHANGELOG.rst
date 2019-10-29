@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Version 0.1.10
+=============
+
+- Fixed Unix newline for `pbstemp` command
+- Added `pbssub` command 
+- Tested `pbscheck` command
+
 Version 0.1.9
 =============
 
