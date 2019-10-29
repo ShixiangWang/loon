@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.7-0.1.8
+=============
+- Updated documentation
+- Updated deployment code
+
 Version 0.1.6
 =============
 
