@@ -208,7 +208,7 @@ class Host:
                     commands_1 = ';'.join(commands_1)
                     self.connect()
                     self.channel.execute(commands_1)
-                    scripts = self.get_result()[0].split('\n')
+                    scripts = self.get_result(print_info=False)[0].split('\n')
                     scripts.remove('')
                 if prog is None:
                     commands_1 = list(map(lambda x: 'chmod u+x '+x, scripts))
@@ -220,6 +220,7 @@ class Host:
                     commands = ';'.join(commands)
                 _logger.info(commands)
                 self.connect()
+                print("=> Getting results:")
                 self.channel.execute(commands)
             else:
                 # Run local scripts
@@ -229,8 +230,15 @@ class Host:
                 if data_dir is not None:
                     self.upload(data_dir, dir, _logger)
                 # 2) get all file names
+                if len(scripts) == 1:
+                    if isdir(scripts[0]): 
+                        if list(scripts[0])[-1] == '/':
+                            dir = os.path.join(dir, os.path.basename(os.path.dirname(scripts[0])))
+                        else:
+                            dir = os.path.join(dir, os.path.basename(scripts[0]))
+                        scripts = glob.glob(scripts[0] + '/*')
                 filelist = []
-                for fp in commands:
+                for fp in scripts:
                     _logger.info("fp:%s"%fp)
                     fs = glob.glob(fp)
                     _logger.info("fs:%s"%fs)
@@ -241,7 +249,7 @@ class Host:
                         else:
                             filelist.append(f)
                 filelist = list(map(os.path.basename, filelist))
-                print(filelist)
+                _logger.info(filelist)
                 # 3) run them one by one
                 scripts = list(map(lambda x: '/'.join([dir, x]), filelist))
                 if prog is None:
@@ -254,6 +262,7 @@ class Host:
                     commands = ';'.join(commands)
                 _logger.info(commands)
                 self.connect()
+                print("=> Getting results:")
                 self.channel.execute(commands)
                 
         datalist = self.get_result()
@@ -295,7 +304,7 @@ class Host:
         print("=> Starting upload...", end="\n\n")
         now = datetime.now()  
         _logger.info("Running " + cmds)
-        run(cmds)
+        run(cmds, shell=True)
         taken = datetime.now() - now
         print("\n=> Finished uploading in %ss" %taken.seconds)
         return

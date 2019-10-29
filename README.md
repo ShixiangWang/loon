@@ -5,7 +5,9 @@
 
 ## Description
 
-**loon** is a Python toolkit for operating remote host based on SSH. Idea for developing **loon** comes from [**sync-deploy**](https://github.com/ShixiangWang/sync-deploy), which is limited by its pure bash code. Therefore, I use Python to implement it and more features will be added to it in the future.
+**loon** is a Python toolkit for operating remote host based on SSH. Idea for developing **loon** comes from [**sync-deploy**](https://github.com/ShixiangWang/sync-deploy), which is limited by its pure bash code. Therefore, I use Python to implement it and more features will be added to it in the future. 
+
+**Fore Windows users, software providing basic linux commands like `ssh` and `scp` is required, I recommend using [git bash](https://git-scm.com/downloads).**
 
 ## Installation
 
@@ -134,11 +136,62 @@ drwxr-xr-x     3 wsx liulab     32 Aug 22 17:13 tools
 drwxr-xr-x.    2 wsx liulab      6 Apr  4 10:36 Videos
 ```
 
-- Upload files (not fully supported)
+- Run local scripts
 
-TODO
+This will upload scripts to remote host firstly, then run them.
+
+```shell
+$ loon run -f ../../tests/scripts/t*.py
+=> Starting upload...
+
+t1.py                                          100%   50    49.0KB/s   00:00    
+t2.py                                          100%   50    77.6KB/s   00:00    
+
+=> Finished uploading in 1s
+=> Getting results:
+This is t1 script.
+This is t2 script.
+```
+
+- If input contains both files and directories, all files in directory will not be executed. This is a way to include child scripts which does not need to be executed. 
+- If input is only a directory, all scripts (not including scripts in subdirectories) under it will be executed. This is the way to maintain an independent project.
+
+You can include data directory using `--data` flag, specify program like `bash` or `python` using `--prog` flag and set remote directory using `--dir` flag.
+
+- Upload and download files 
+
+Use them like `cp` command.
+
+```shell
+$ loon upload -h
+usage: loon upload [-h] [-v] source [source ...] destination
+
+positional arguments:
+  source         Source files to upload
+  destination    Remote destination directory, note '~' should be quoted in
+                 some cases
+
+optional arguments:
+  -h, --help     show this help message and exit
+  -v, --verbose  set loglevel to INFO
+
+$ loon download -h
+usage: loon download [-h] [-v] source [source ...] destination
+
+positional arguments:
+  source         Source files to download
+  destination    Local destination directory, note '~' should be quoted in
+                 some cases
+
+optional arguments:
+  -h, --help     show this help message and exit
+  -v, --verbose  set loglevel to INFO
+```
 
 ### PBS management and tasks
+
+- Added `pbstemp` command
+- Added `pbscheck` command
 
 TODO
 
@@ -146,7 +199,8 @@ TODO
 
 ```shell
 usage: loon [-h] [--version] [--author]
-            {add,delete,switch,list,rename,run,upload} ...
+                   {add,delete,switch,list,rename,run,upload,download,pbstemp,pbscheck}
+                   ...
 
 Be an efficient loon.
 
@@ -156,15 +210,18 @@ optional arguments:
   --author              show info of program's author
 
 subcommands:
-  {add,delete,switch,list,rename,run,upload}
+  {add,delete,switch,list,rename,run,upload,download,pbstemp,pbscheck}
                         description
     add                 Add a remote host
     delete              Delete a remote host
     switch              Switch active remote host
     list                List all remote hosts
     rename              Rename host alias
-    run                 Run commands on the active remote host
+    run                 Run commands or scripts on the active remote host
     upload              Upload files to active remote host
+    download            Download files from active remote host
+    pbstemp             Generate a PBS template file
+    pbscheck            Check status of a PBS job on remote host
 ```
 
 ## Note

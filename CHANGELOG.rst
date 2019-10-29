@@ -5,6 +5,7 @@ Changelog
 Version 0.1.6
 =============
 
+- Implemented `run` command
 - Implemented `upload` command
 - Added `download` command
 - Added `pbstemp` command
