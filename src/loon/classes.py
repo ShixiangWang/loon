@@ -498,6 +498,25 @@ class PBS:
                         sys.exit(1)
         return filelist
 
+    def deploy(self, host, source, destination, _logger):
+        """Deploy target directory on the active remote host
+        
+        Upload the target destination and then submit all *.pbs files
+        """
+        if destination is None:
+            destination = '/tmp'
+        if not isdir(source):
+            print("Error: directory %s does not exist"%source)
+            sys.exit(1)
+        host.upload(source, destination, _logger)
+        self.sub(
+            host, 
+            destination + '/*.pbs', 
+            True, 
+            destination, 
+            _logger)
+        return
+
     def check(self, host, job_id):
         """Check PBS task status"""
         if job_id is None:
