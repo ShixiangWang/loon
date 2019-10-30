@@ -456,10 +456,9 @@ class PBS:
         print("Done.")
         return
 
-    def sub(self, host, tasks, remote, _logger):
+    def sub(self, host, tasks, remote, workdir, _logger):
         """Submit pbs tasks"""
-        print('NOTE: loon does not check if file/directory exits.')
-        print('PBS file must be LF mode (Unix), not CRLF mode (Windows)')
+        print('NOTE: PBS file must be LF mode (Unix), not CRLF mode (Windows)')
         print('====================================================')
         filelist = []
         if remote:
@@ -476,9 +475,14 @@ class PBS:
                 if f=='' or f==' ':
                     filelist.remove(f)
             _logger.info(filelist)
-            cmds = 'for i in {}; do qsub $i; done'.format(' '.join(filelist))
+            if workdir is None:
+                workdir='/tmp'
+            cmds = 'cd {}; for i in {}; do qsub $i; done'.format(workdir, ' '.join(filelist))
+            _logger.info(cmds)
             host.cmd(cmds, _logger=_logger)
         else:
+            if workdir is None:
+                workdir=os.getcwd()
             for fp in tasks:
                 fs = glob.glob(fp)
                 for f in fs:
@@ -486,7 +490,9 @@ class PBS:
                         print("Warning: directory %s is detected, note anything in it will be ignored to execute." %f)
                     elif isfile(f):
                         filelist.append(f)
-                        run('qsub ' + f)
+                        cmds = 'cd ' + workdir + ';qsub ' + f
+                        _logger.info(cmds)
+                        run(cmds)
                     else:
                         print('Error: file %s does not exist.'%f)
                         sys.exit(1)

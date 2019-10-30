@@ -270,6 +270,11 @@ def parse_args(args):
       help='PBS task files are located at the active remote host',
       action='store_true')
     parser_pbssub.add_argument(
+      '--workdir',
+      help='Working directory, default is /tmp for remote host and otherwise the command executed path',  
+      required=False
+    )
+    parser_pbssub.add_argument(
       nargs='+',
       dest='tasks',
       help="Tasks to submit, can be a directory containing only tasks"
@@ -385,22 +390,42 @@ def main(args):
     elif args.subparsers_name == 'upload':
       _logger.info("Upload command is detected.")
       #host.connect(open_channel=False)
-      host.upload(args.source, args.destination, _logger=_logger)
+      host.upload(
+        args.source, 
+        args.destination,
+        _logger=_logger)
     elif args.subparsers_name == 'download':
       _logger.info("Download command is detected.")
       #host.connect(open_channel=False)
-      host.download(args.source, args.destination, _logger=_logger)
+      host.download(
+        args.source, 
+        args.destination,
+        _logger=_logger)
     elif args.subparsers_name == 'pbstemp':
       _logger.info("pbstemp command is detected.")
-      pbs.gen_template(args.input, args.output)
+      pbs.gen_template(
+        args.input,
+        args.output)
     elif args.subparsers_name == 'pbsgen':
       _logger.info("pbsgen command is detected.")
-      pbs.gen_pbs(args.template, args.samplefile, args.mapfile, args.output, _logger=_logger)
+      pbs.gen_pbs(
+        args.template, 
+        args.samplefile, 
+        args.mapfile, 
+        args.output, 
+        _logger=_logger)
     elif args.subparsers_name == 'pbsgen_example':
-      pbs.gen_pbs_example(args.output, _logger=_logger)
+      pbs.gen_pbs_example(
+        args.output, 
+        _logger=_logger)
     elif args.subparsers_name == 'pbssub':
       _logger.info("pbssub command is detected.")
-      pbs.sub(host, args.tasks, args.remote_file, _logger=_logger)
+      pbs.sub(
+        host, 
+        args.tasks, 
+        args.remote_file, 
+        args.workdir,
+        _logger=_logger)
     elif args.subparsers_name == 'pbscheck':
       _logger.info("pbscheck command is detected.")
       pbs.check(host, args.job_id)
