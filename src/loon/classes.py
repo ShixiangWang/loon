@@ -373,7 +373,12 @@ class PBS:
         print("=> Done.")
         return
 
-    def gen_pbs(self):
+    def gen_pbs(self, template, samplefile, mapfile, outdir, _logger):
+        """Generate a batch of PBS tasks based on template and mapping file"""
+        pass
+
+    def gen_pbs_example(self, outdir, _logger):
+        """Generate example files for pbsgen command to specified directory"""
         pass
 
     def sub(self, host, tasks, remote, _logger):

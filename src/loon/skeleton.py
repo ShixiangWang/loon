@@ -134,7 +134,7 @@ def parse_args(args):
     # Create the parser for the "run" command
     parser_run = subparsers.add_parser(
       'run',
-      help='Run commands or scripts on the active remote host',
+      help='Run commands or scripts on remote',
       parents=[verbose_parser]
     )
     parser_run.add_argument(
@@ -222,6 +222,39 @@ def parse_args(args):
       help="Output file, default is work.pbs",
       type=str,
       required=False
+    )
+
+    # Create the parser for the "pbsgen" command
+    parser_pbsgen = subparsers.add_parser(
+      'pbsgen',
+      help='Generate a batch of PBS files',
+      parents=[verbose_parser]
+    )
+    parser_pbsgen.add_argument(
+      '-t', '--template',
+      help="A PBS template file"
+    )
+    parser_pbsgen.add_argument(
+      '-s', '--samplefile',
+      help="A csv file with columns used to iterate"
+    )
+    parser_pbsgen.add_argument(
+      '-m', '--mapfile',
+      help="A csv file contains mapping between labels and column index (0-based) in samplefile"
+    )
+    parser_pbsgen.add_argument(
+      '-o', '--output',
+      help="Output directory"
+    )
+
+    # Create the parser for the "pbsgen_example" command
+    parser_genexample = subparsers.add_parser(
+      'pbsgen_example',
+      help='Generate example files for pbsgen command'
+    )
+    parser_genexample.add_argument(
+      'output',
+      help='Output directory'
     )
 
     # Create the parser for the "pbssub" command
@@ -359,6 +392,11 @@ def main(args):
     elif args.subparsers_name == 'pbstemp':
       _logger.info("pbstemp command is detected.")
       pbs.gen_template(args.input, args.output)
+    elif args.subparsers_name == 'pbsgen':
+      _logger.info("pbsgen command is detected.")
+      pbs.gen_pbs(args.template, args.samplefile, args.mapfile, args.output, _logger=_logger)
+    elif args.subparsers_name == 'pbsgen_example':
+      pbs.gen_pbs_example(args.output, _logger=_logger)
     elif args.subparsers_name == 'pbssub':
       _logger.info("pbssub command is detected.")
       pbs.sub(host, args.tasks, args.remote_file, _logger=_logger)
