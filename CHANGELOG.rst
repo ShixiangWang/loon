@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.1.12
+=============
+
+- Updated `pbssub` command
+- Added `pbsdeploy` command
+
 Version 0.1.11
 =============
 
