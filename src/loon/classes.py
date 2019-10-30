@@ -11,6 +11,7 @@ import io
 from getpass import getpass
 from subprocess import run, PIPE
 from datetime import datetime
+from shutil import copyfile
 from ssh2.session import Session
 if __package__ == '' or __package__ is None:  # Use for test
     from __init__ import __host_file__
@@ -344,6 +345,9 @@ class PBS:
     def __init__(self):
         self.tmp_header = os.path.join(data_dir, "PBS_HEADER.txt")
         self.tmp_cmds = os.path.join(data_dir, "PBS_CMDS.txt")
+        self.pbs_template = os.path.join(data_dir, "pbs-template.pbs")
+        self.samplefile = os.path.join(data_dir, "samplefile.csv")
+        self.mapfile = os.path.join(data_dir, "mapping.csv")
         return
 
     def gen_template(self, input, output):
@@ -379,7 +383,23 @@ class PBS:
 
     def gen_pbs_example(self, outdir, _logger):
         """Generate example files for pbsgen command to specified directory"""
-        pass
+        if not isdir(outdir):
+            print("Directory %s does not exist, creating it"%outdir)
+            os.makedirs(outdir)
+        pbs_template = os.path.join(outdir, os.path.basename(self.pbs_template))
+        samplefile = os.path.join(outdir, os.path.basename(self.samplefile))
+        mapfile = os.path.join(outdir, os.path.basename(self.mapfile))
+        print("=====================")
+        print("Output path : "+outdir)
+        print("PBS Template: "+pbs_template)
+        print("Sample file : "+samplefile)
+        print("Mapping file: "+mapfile)
+        print("=====================")
+        copyfile(self.pbs_template, pbs_template)
+        copyfile(self.samplefile, samplefile)
+        copyfile(self.mapfile, mapfile)
+        print("Done.")
+        return
 
     def sub(self, host, tasks, remote, _logger):
         """Submit pbs tasks"""

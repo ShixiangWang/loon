@@ -250,7 +250,8 @@ def parse_args(args):
     # Create the parser for the "pbsgen_example" command
     parser_genexample = subparsers.add_parser(
       'pbsgen_example',
-      help='Generate example files for pbsgen command'
+      help='Generate example files for pbsgen command',
+      parents=[verbose_parser]
     )
     parser_genexample.add_argument(
       'output',
