@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Version 0.1.11
+=============
+
+- Fixed some bugs
+- Added `pbsgen` command
+- Added `pbsgen_example` command
+- Added some data files
+
 Version 0.1.10
 =============
 

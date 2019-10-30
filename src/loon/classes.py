@@ -15,10 +15,10 @@ from shutil import copyfile
 from ssh2.session import Session
 if __package__ == '' or __package__ is None:  # Use for test
     from __init__ import __host_file__
-    from utils import create_parentdir, isfile, isdir, pretty_table, get_filelist
+    from utils import create_parentdir, isfile, isdir, pretty_table, get_filelist, read_csv
 else:
     from loon import __host_file__
-    from loon.utils import create_parentdir, isfile, isdir, pretty_table, get_filelist
+    from loon.utils import create_parentdir, isfile, isdir, pretty_table, get_filelist, read_csv
 
 this_file = os.path.realpath(__file__)
 this_dir = os.path.dirname(this_file)
@@ -379,6 +379,28 @@ class PBS:
 
     def gen_pbs(self, template, samplefile, mapfile, outdir, _logger):
         """Generate a batch of PBS tasks based on template and mapping file"""
+        if not isdir(outdir):
+            print("Directory %s does not exist, creating it"%outdir)
+            os.makedirs(outdir)
+        if not isfile(template):
+            print("Error: file %s does not exist" %template)
+        if not isfile(samplefile):
+            print("Error: file %s does not exist" %samplefile)
+        if not isfile(mapfile):
+            print("Error: file %s does not exist" %mapfile)
+        
+        print("=====================")
+        print("Output path : "+outdir)
+        print("PBS Template: "+template)
+        print("Sample file : "+samplefile)
+        print("Mapping file: "+mapfile)
+        print("=====================")
+
+        print("=> Reading %s ..."%samplefile)
+        print("=> Reading %s ..."%mapfile)
+
+        
+
         pass
 
     def gen_pbs_example(self, outdir, _logger):

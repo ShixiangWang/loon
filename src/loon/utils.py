@@ -60,6 +60,22 @@ def get_filelist(dirName):
                 
     return allFiles   
 
+def read_csv(file_path, sep=',', method='default'):
+    """Read CSV file"""
+    res = []
+    with open(file_path, "r", encoding='utf-8') as f:
+        if method == "default":
+            for line in f.readlines():
+                res.append(line.strip().split(sep))
+        elif method == "csv":
+            import csv
+            csv_reader = csv.reader(f, delimiter=sep)
+            for row in csv_reader:
+                res.append(row)
+        else:
+            raise ValueError('Not supported!')
+    return res
+
 if __name__ == "__main__":
     # Test pretty_table
     title = ['Alias', 'Username', 'IP address', 'Port']
