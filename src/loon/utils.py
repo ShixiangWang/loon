@@ -1,4 +1,5 @@
 import os
+import csv
 from os.path import isfile, isdir
 
 def create_parentdir(path):
@@ -60,20 +61,22 @@ def get_filelist(dirName):
                 
     return allFiles   
 
-def read_csv(file_path, sep=',', method='default'):
+def decomment(csvfile):
+    for row in csvfile:
+        raw = row.split('#')[0].strip()
+        if raw: 
+            yield raw
+
+def read_csv(file_path, sep=',', rm_comment=True):
     """Read CSV file"""
     res = []
     with open(file_path, "r", encoding='utf-8') as f:
-        if method == "default":
-            for line in f.readlines():
-                res.append(line.strip().split(sep))
-        elif method == "csv":
-            import csv
-            csv_reader = csv.reader(f, delimiter=sep)
-            for row in csv_reader:
-                res.append(row)
+        if rm_comment:
+            csv_reader = csv.reader(decomment(f), delimiter=sep)
         else:
-            raise ValueError('Not supported!')
+            csv_reader = csv.reader(f, delimiter=sep)
+        for row in csv_reader:
+            res.append(row)
     return res
 
 if __name__ == "__main__":

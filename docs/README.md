@@ -196,17 +196,20 @@ optional arguments:
 
 ### PBS management and tasks
 
-- Added `pbstemp` command
-- Added `pbscheck` command
+* `pbstemp` - Generate a PBS template file
+* `pbsgen`  - Generate a batch of PBS files
+* `pbsgen_example` - Generate example files for pbsgen command
+* `pbssub` - Submit PBS tasks
+* `pbscheck` - Check status of PBS job on remote host
 
-TODO
+More details please see `-h` option of the commands above.
 
 ### Current usage info
 
 ```shell
 usage: loon [-h] [--version] [--author]
-                   {add,delete,switch,list,rename,run,upload,download,pbstemp,pbscheck}
-                   ...
+            {add,delete,switch,list,rename,run,upload,download,pbstemp,pbsgen,pbsgen_example,pbssub,pbscheck}
+            ...
 
 Be an efficient loon.
 
@@ -216,18 +219,21 @@ optional arguments:
   --author              show info of program's author
 
 subcommands:
-  {add,delete,switch,list,rename,run,upload,download,pbstemp,pbscheck}
+  {add,delete,switch,list,rename,run,upload,download,pbstemp,pbsgen,pbsgen_example,pbssub,pbscheck}
                         description
     add                 Add a remote host
     delete              Delete a remote host
     switch              Switch active remote host
     list                List all remote hosts
     rename              Rename host alias
-    run                 Run commands or scripts on the active remote host
+    run                 Run commands or scripts on remote
     upload              Upload files to active remote host
     download            Download files from active remote host
     pbstemp             Generate a PBS template file
-    pbscheck            Check status of a PBS job on remote host
+    pbsgen              Generate a batch of PBS files
+    pbsgen_example      Generate example files for pbsgen command
+    pbssub              Submit PBS tasks
+    pbscheck            Check status of PBS job on remote host
 ```
 
 ## Note

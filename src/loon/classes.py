@@ -397,11 +397,44 @@ class PBS:
         print("=====================")
 
         print("=> Reading %s ..."%samplefile)
+        sample_data = read_csv(samplefile)
         print("=> Reading %s ..."%mapfile)
+        map_data = read_csv(mapfile)
 
+        # Check if input files are valid
+        check_list = [i[0] for i in sample_data]
+        check_list = set(check_list)
+        if len(sample_data) != len(check_list):
+            print("Error: the first column is not unique!")
+            sys.exit(1)
+        for row in map_data:
+            if len(row) != 2:
+                print("Error: only two columns are quired in mapfile!")
+            try:
+                _ = int(row[1])
+            except Exception:
+                print("Error: the second column must be (or can be transformed to) an integer!")
+                sys.exit(1)
+
+        print("=> Reading %s ..."%template)
+        with open(template, 'r') as f:
+            temp_data = f.read()
         
-
-        pass
+        print("Generating...")
+        for row in sample_data:
+            pbsfile = os.path.join(outdir, row[0]+'.pbs')
+            _logger.info("Generating %s"%pbsfile)
+            content = temp_data
+            for i in map_data:
+                try:
+                    _logger.info("Replacing %s with %s" %(i[0], row[int(i[1])]))
+                    content = content.replace(i[0], row[int(i[1])])
+                except Exception:
+                    print("Error: the second column out of range for label %s!"%i[0])
+            with io.open(pbsfile, 'w', encoding='utf-8', newline='\n') as f:
+                f.write(content)
+        print("Done.")
+        return
 
     def gen_pbs_example(self, outdir, _logger):
         """Generate example files for pbsgen command to specified directory"""

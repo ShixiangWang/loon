@@ -232,15 +232,15 @@ def parse_args(args):
     )
     parser_pbsgen.add_argument(
       '-t', '--template',
-      help="A PBS template file"
+      help="A PBS template file containing placeholders"
     )
     parser_pbsgen.add_argument(
       '-s', '--samplefile',
-      help="A csv file with columns used to iterate"
+      help="A csv file containing unique filenames (the first column) and replacing labels"
     )
     parser_pbsgen.add_argument(
       '-m', '--mapfile',
-      help="A csv file contains mapping between labels and column index (0-based) in samplefile"
+      help="A csv file containing placeholders and column index (0-based) indicating replacing labels in samplefile"
     )
     parser_pbsgen.add_argument(
       '-o', '--output',
