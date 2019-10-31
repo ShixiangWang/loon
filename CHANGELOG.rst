@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.16
+=============
+
+- Reformatted code using [**yapf**](https://github.com/google/yapf)
+
 Version 0.1.15
 =============
 

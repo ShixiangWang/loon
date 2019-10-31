@@ -13,7 +13,7 @@ from subprocess import run, PIPE
 from datetime import datetime
 from shutil import copyfile
 from ssh2.session import Session
-if __package__ == '' or __package__ is None:  # Use for test
+if __package__ == '' or __package__ is None:    # Use for test
     from __init__ import __host_file__
     from utils import create_parentdir, isfile, isdir, pretty_table, get_filelist, read_csv
 else:
@@ -24,11 +24,12 @@ this_file = os.path.realpath(__file__)
 this_dir = os.path.dirname(this_file)
 data_dir = os.path.join(this_dir, 'data')
 
+
 class Host:
     """
     Representation of remote host
     """
-    def __init__(self, hostfile = __host_file__):
+    def __init__(self, hostfile=__host_file__):
         self.hostfile = hostfile
         self.load_hosts()
         return
@@ -45,21 +46,23 @@ class Host:
             self.available_hosts = hosts['available']
 
         if any(isinstance(i, list) for i in self.active_host):
-            print("Error: more than one active host. Please check config file ~/.config/loon/host.json and modify or remove it if necessary.")
+            print(
+                "Error: more than one active host. Please check config file ~/.config/loon/host.json and modify or remove it if necessary."
+            )
 
-        # Python code to remove duplicate elements 
-        def RemoveDups(duplicate): 
-            final_list = [] 
+        # Python code to remove duplicate elements
+        def RemoveDups(duplicate):
+            final_list = []
             flag = False
-            for num in duplicate: 
-                if num not in final_list: 
-                    final_list.append(num) 
-                else: 
+            for num in duplicate:
+                if num not in final_list:
+                    final_list.append(num)
+                else:
                     flag = True
             return final_list, flag
-        
+
         self.available_hosts, flag = RemoveDups(self.available_hosts)
-        
+
         if flag:
             # Save unique hosts immediately
             self.save_hosts()
@@ -70,7 +73,7 @@ class Host:
         """Save hosts to file"""
         # if len(self.active_host)==0 or len(self.available_hosts)==0:
         #     raise ValueError("Cannot save to file due to null host.")
-        hosts = {'active':self.active_host, 'available':self.available_hosts}
+        hosts = {'active': self.active_host, 'available': self.available_hosts}
         if not isfile(self.hostfile):
             # Create parent dir if hostfile does not exist
             create_parentdir(self.hostfile)
@@ -105,7 +108,9 @@ class Host:
                 if h[1:] == info:
                     host = h.copy()
         if len(host) == 0:
-            print("=> Host does not exist, please check input with list command!")
+            print(
+                "=> Host does not exist, please check input with list command!"
+            )
             sys.exit(1)
         return host
 
@@ -118,13 +123,13 @@ class Host:
             print("=> Removing active host...")
             if len(self.available_hosts) > 0:
                 self.active_host = self.available_hosts[0]
-                print("=> Changing active host to %s" %self.active_host[0])
+                print("=> Changing active host to %s" % self.active_host[0])
             else:
-                self.active_host = []  # reset
+                self.active_host = []    # reset
                 print("=> Reseting active host to []")
         self.save_hosts()
         return
-    
+
     def switch(self, name, username, host, port=22):
         """Switch active host"""
         host2switch = self.host_check(name, username, host, port)
@@ -135,20 +140,21 @@ class Host:
 
     def rename(self, old, new):
         """Rename host name"""
-        host2rename = []        
+        host2rename = []
         for index, h in enumerate(self.available_hosts):
             if h[0] == old:
                 host2rename = h.copy()
                 self.available_hosts[index][0] = new
         if len(host2rename) == 0:
-            print("=> Host does not exist, please check input with list command!")
+            print(
+                "=> Host does not exist, please check input with list command!"
+            )
             sys.exit(1)
         if host2rename == self.active_host:
             self.active_host[0] = new
         self.save_hosts()
         return
-        
-        
+
     def list(self):
         """List all remote hosts"""
 
@@ -156,12 +162,15 @@ class Host:
         content = self.available_hosts.copy()
         for host in content:
             if host == self.active_host:
-                host[0] = '<'+host[0]+'>'
+                host[0] = '<' + host[0] + '>'
         pretty_table(title, content)
         print("<active host>")
         return
-    
-    def connect(self, privatekey_file="~/.ssh/id_rsa", passphrase='', open_channel=True):
+
+    def connect(self,
+                privatekey_file="~/.ssh/id_rsa",
+                passphrase='',
+                open_channel=True):
         """Connect active host and open a session."""
         privatekey_file = os.path.expanduser(privatekey_file)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -170,17 +179,27 @@ class Host:
         s.handshake(sock)
         try:
             # Try using private key file first
-            s.userauth_publickey_fromfile(self.active_host[1], privatekey_file, passphrase)
+            s.userauth_publickey_fromfile(self.active_host[1], privatekey_file,
+                                          passphrase)
         except:
             # Use password to auth
-            passwd = getpass('No private key found.\nEnter your password for %s: ' %self.active_host[1])
+            passwd = getpass(
+                'No private key found.\nEnter your password for %s: ' %
+                self.active_host[1])
             s.userauth_password(self.active_host[1], passwd)
         self.session = s
         if open_channel:
             self.channel = self.session.open_session()
         return
-    
-    def cmd(self, commands, _logger=None, run_file=False, data_dir=None, remote_file=False, dir='/tmp', prog=None):
+
+    def cmd(self,
+            commands,
+            _logger=None,
+            run_file=False,
+            data_dir=None,
+            remote_file=False,
+            dir='/tmp',
+            prog=None):
         """Run command(s) in active remote host using channel session
         Therefore, `open_channel` in `connect` method must be `True` before using it.
 
@@ -204,21 +223,25 @@ class Host:
                 # Support some wildcards
                 # *,?,{}
                 wildcards = r'\*|\?|\{\}'
-                matches = [re.compile(wildcards).search(i) is not None for i in scripts]
+                matches = [
+                    re.compile(wildcards).search(i) is not None
+                    for i in scripts
+                ]
                 if any(matches):
-                    commands_1 = list(map(lambda x: 'ls '+x, scripts))
+                    commands_1 = list(map(lambda x: 'ls ' + x, scripts))
                     commands_1 = ';'.join(commands_1)
                     self.connect()
                     self.channel.execute(commands_1)
                     scripts = self.get_result(print_info=False)[0].split('\n')
                     scripts.remove('')
                 if prog is None:
-                    commands_1 = list(map(lambda x: 'chmod u+x '+x, scripts))
+                    commands_1 = list(map(lambda x: 'chmod u+x ' + x, scripts))
                     commands_1 = ';'.join(commands_1)
                     commands_2 = ';'.join(scripts)
                     commands = commands_1 + ';' + commands_2
                 else:
-                    commands = list(map(lambda x: '{} '.format(prog)+x, scripts))
+                    commands = list(
+                        map(lambda x: '{} '.format(prog) + x, scripts))
                     commands = ';'.join(commands)
                 _logger.info(commands)
                 self.connect()
@@ -233,46 +256,52 @@ class Host:
                     self.upload(data_dir, dir, _logger)
                 # 2) get all file names
                 if len(scripts) == 1:
-                    if isdir(scripts[0]): 
+                    if isdir(scripts[0]):
                         if list(scripts[0])[-1] == '/':
-                            dir = os.path.join(dir, os.path.basename(os.path.dirname(scripts[0])))
+                            dir = os.path.join(
+                                dir,
+                                os.path.basename(os.path.dirname(scripts[0])))
                         else:
-                            dir = os.path.join(dir, os.path.basename(scripts[0]))
+                            dir = os.path.join(dir,
+                                               os.path.basename(scripts[0]))
                         scripts = glob.glob(scripts[0] + '/*')
                 filelist = []
                 for fp in scripts:
-                    _logger.info("fp:%s"%fp)
+                    _logger.info("fp:%s" % fp)
                     fs = glob.glob(fp)
-                    _logger.info("fs:%s"%fs)
+                    _logger.info("fs:%s" % fs)
                     for f in fs:
-                        _logger.info("f:%s"%f)
+                        _logger.info("f:%s" % f)
                         if isdir(f):
-                            print("Warning: directory %s is detected, note anything in it will be ignored to execute." %f)
+                            print(
+                                "Warning: directory %s is detected, note anything in it will be ignored to execute."
+                                % f)
                         elif isfile(f):
                             filelist.append(f)
                         else:
-                            print('Error: file %s does not exist.'%f)
+                            print('Error: file %s does not exist.' % f)
                             sys.exit(1)
                 filelist = list(map(os.path.basename, filelist))
                 _logger.info(filelist)
                 # 3) run them one by one
                 scripts = list(map(lambda x: '/'.join([dir, x]), filelist))
                 if prog is None:
-                    commands_1 = list(map(lambda x: 'chmod u+x '+x, scripts))
+                    commands_1 = list(map(lambda x: 'chmod u+x ' + x, scripts))
                     commands_1 = ';'.join(commands_1)
                     commands_2 = ';'.join(scripts)
                     commands = commands_1 + ';' + commands_2
                 else:
-                    commands = list(map(lambda x: '{} '.format(prog)+x, scripts))
+                    commands = list(
+                        map(lambda x: '{} '.format(prog) + x, scripts))
                     commands = ';'.join(commands)
                 _logger.info(commands)
                 self.connect()
                 print("=> Getting results:")
                 self.channel.execute(commands)
-                
+
         datalist = self.get_result()
         return datalist
-    
+
     def get_result(self, print_info=True):
         """Get result from executed channel"""
         size, errinfo = self.channel.read_stderr()
@@ -291,8 +320,8 @@ class Host:
                     print(data, end='')
                 datalist.append(data)
                 size, data = self.channel.read()
-        
-        # Return a list containing output from commands 
+
+        # Return a list containing output from commands
         return datalist
 
     def upload(self, source, destination, _logger, use_rsync=False):
@@ -311,20 +340,20 @@ class Host:
             destination = destination + '/'
         if use_rsync:
             cmds = "rsync -azP -e 'ssh -p {port}' {source} {username}@{host}:{destination}".format(
-                port=port, 
-                source=' '.join(map(os.path.expanduser, source)), 
-                username=username, 
-                host=host, 
+                port=port,
+                source=' '.join(map(os.path.expanduser, source)),
+                username=username,
+                host=host,
                 destination=destination)
         else:
             cmds = "scp -pr -P {port} {source} {username}@{host}:{destination}".format(
-                port=port, 
+                port=port,
                 source=' '.join(map(os.path.expanduser, source)),
                 username=username,
-                host=host, 
+                host=host,
                 destination=destination)
         print("=> Starting upload...", end="\n\n")
-        now = datetime.now()  
+        now = datetime.now()
         _logger.info("Running " + cmds)
         run_res = run(cmds, shell=True)
         _logger.info("Status code: " + str(run_res.returncode))
@@ -332,10 +361,9 @@ class Host:
             print("Error: some error occurred, please check the info!")
             sys.exit(run_res.returncode)
         taken = datetime.now() - now
-        print("\n=> Finished uploading in %ss" %taken.seconds)
+        print("\n=> Finished uploading in %ss" % taken.seconds)
         return
-     
-        
+
     def download(self, source, destination, _logger, use_rsync=False):
         """Download files to local machine from active remote host.
         
@@ -353,20 +381,20 @@ class Host:
         if list(destination)[-1] != '/':
             destination = destination + '/'
         print("=> Starting downloading...", end="\n\n")
-        now = datetime.now()  
+        now = datetime.now()
         if use_rsync:
             cmds = "rsync -azP -e 'ssh -p {port}' {username}@{host}:'{source}' {destination}".format(
-                port=port, 
-                source=' '.join(source), 
-                username=username, 
-                host=host, 
+                port=port,
+                source=' '.join(source),
+                username=username,
+                host=host,
                 destination=os.path.expanduser(destination))
         else:
             cmds = "scp -pr -P {port} {username}@{host}:'{source}' {destination}".format(
-                port=port, 
-                source=' '.join(source), 
-                username=username, 
-                host=host, 
+                port=port,
+                source=' '.join(source),
+                username=username,
+                host=host,
                 destination=os.path.expanduser(destination))
         _logger.info("Running " + cmds)
         run_res = run(cmds, shell=True)
@@ -375,7 +403,7 @@ class Host:
             print("Error: some error occurred, please check the info!")
             sys.exit(run_res.returncode)
         taken = datetime.now() - now
-        print("\n=> Finished downloading in %ss" %taken.seconds)
+        print("\n=> Finished downloading in %ss" % taken.seconds)
         return
 
 
@@ -395,7 +423,7 @@ class PBS:
         """Generate a PBS template"""
         if output is None:
             output = os.path.join(os.getcwd(), 'work.pbs')
-        print("=> Generating %s" %output)
+        print("=> Generating %s" % output)
         if isfile(output):
             print("Warning: the output file exists, it will be overwritten.")
         if input is None:
@@ -421,25 +449,25 @@ class PBS:
     def gen_pbs(self, template, samplefile, mapfile, outdir, _logger):
         """Generate a batch of PBS tasks based on template and mapping file"""
         if not isdir(outdir):
-            print("Directory %s does not exist, creating it"%outdir)
+            print("Directory %s does not exist, creating it" % outdir)
             os.makedirs(outdir)
         if not isfile(template):
-            print("Error: file %s does not exist" %template)
+            print("Error: file %s does not exist" % template)
         if not isfile(samplefile):
-            print("Error: file %s does not exist" %samplefile)
+            print("Error: file %s does not exist" % samplefile)
         if not isfile(mapfile):
-            print("Error: file %s does not exist" %mapfile)
-        
+            print("Error: file %s does not exist" % mapfile)
+
         print("=====================")
-        print("Output path : "+outdir)
-        print("PBS Template: "+template)
-        print("Sample file : "+samplefile)
-        print("Mapping file: "+mapfile)
+        print("Output path : " + outdir)
+        print("PBS Template: " + template)
+        print("Sample file : " + samplefile)
+        print("Mapping file: " + mapfile)
         print("=====================")
 
-        print("=> Reading %s ..."%samplefile)
+        print("=> Reading %s ..." % samplefile)
         sample_data = read_csv(samplefile)
-        print("=> Reading %s ..."%mapfile)
+        print("=> Reading %s ..." % mapfile)
         map_data = read_csv(mapfile)
 
         # Check if input files are valid
@@ -454,24 +482,29 @@ class PBS:
             try:
                 _ = int(row[1])
             except Exception:
-                print("Error: the second column must be (or can be transformed to) an integer!")
+                print(
+                    "Error: the second column must be (or can be transformed to) an integer!"
+                )
                 sys.exit(1)
 
-        print("=> Reading %s ..."%template)
+        print("=> Reading %s ..." % template)
         with open(template, 'r') as f:
             temp_data = f.read()
-        
+
         print("Generating...")
         for row in sample_data:
-            pbsfile = os.path.join(outdir, row[0]+'.pbs')
-            _logger.info("Generating %s"%pbsfile)
+            pbsfile = os.path.join(outdir, row[0] + '.pbs')
+            _logger.info("Generating %s" % pbsfile)
             content = temp_data
             for i in map_data:
                 try:
-                    _logger.info("Replacing %s with %s" %(i[0], row[int(i[1])]))
+                    _logger.info("Replacing %s with %s" %
+                                 (i[0], row[int(i[1])]))
                     content = content.replace(i[0], row[int(i[1])])
                 except Exception:
-                    print("Error: the second column out of range for label %s!"%i[0])
+                    print(
+                        "Error: the second column out of range for label %s!" %
+                        i[0])
             with io.open(pbsfile, 'w', encoding='utf-8', newline='\n') as f:
                 f.write(content)
         print("Done.")
@@ -480,16 +513,17 @@ class PBS:
     def gen_pbs_example(self, outdir, _logger):
         """Generate example files for pbsgen command to specified directory"""
         if not isdir(outdir):
-            print("Directory %s does not exist, creating it"%outdir)
+            print("Directory %s does not exist, creating it" % outdir)
             os.makedirs(outdir)
-        pbs_template = os.path.join(outdir, os.path.basename(self.pbs_template))
+        pbs_template = os.path.join(outdir,
+                                    os.path.basename(self.pbs_template))
         samplefile = os.path.join(outdir, os.path.basename(self.samplefile))
         mapfile = os.path.join(outdir, os.path.basename(self.mapfile))
         print("=====================")
-        print("Output path : "+outdir)
-        print("PBS Template: "+pbs_template)
-        print("Sample file : "+samplefile)
-        print("Mapping file: "+mapfile)
+        print("Output path : " + outdir)
+        print("PBS Template: " + pbs_template)
+        print("Sample file : " + samplefile)
+        print("Mapping file: " + mapfile)
         print("=====================")
         copyfile(self.pbs_template, pbs_template)
         copyfile(self.samplefile, samplefile)
@@ -511,31 +545,34 @@ class PBS:
             filelist.remove('')
             fl_bk = filelist.copy()
             for f in fl_bk:
-                if len(f) > 1 and (f[-1]=='/' or f[-1]==':'):
+                if len(f) > 1 and (f[-1] == '/' or f[-1] == ':'):
                     filelist.remove(f)
-                if f=='' or f==' ':
+                if f == '' or f == ' ':
                     filelist.remove(f)
             _logger.info(filelist)
             if workdir is None:
-                workdir='/tmp'
-            cmds = 'cd {}; for i in {}; do qsub $i; done'.format(workdir, ' '.join(filelist))
+                workdir = '/tmp'
+            cmds = 'cd {}; for i in {}; do qsub $i; done'.format(
+                workdir, ' '.join(filelist))
             _logger.info(cmds)
             host.cmd(cmds, _logger=_logger)
         else:
             if workdir is None:
-                workdir=os.getcwd()
+                workdir = os.getcwd()
             for fp in tasks:
                 fs = glob.glob(fp)
                 for f in fs:
                     if isdir(f):
-                        print("Warning: directory %s is detected, note anything in it will be ignored to execute." %f)
+                        print(
+                            "Warning: directory %s is detected, note anything in it will be ignored to execute."
+                            % f)
                     elif isfile(f):
                         filelist.append(f)
                         cmds = 'cd ' + workdir + ';qsub ' + f
                         _logger.info(cmds)
                         run(cmds, shell=True)
                     else:
-                        print('Error: file %s does not exist.'%f)
+                        print('Error: file %s does not exist.' % f)
                         sys.exit(1)
         return filelist
 
@@ -547,15 +584,10 @@ class PBS:
         if destination is None:
             destination = '/tmp'
         if not isdir(source):
-            print("Error: directory %s does not exist"%source)
+            print("Error: directory %s does not exist" % source)
             sys.exit(1)
         host.upload(source, destination, _logger, use_rsync=use_rsync)
-        self.sub(
-            host, 
-            destination + '/*.pbs', 
-            True, 
-            destination, 
-            _logger)
+        self.sub(host, destination + '/*.pbs', True, destination, _logger)
         return
 
     def check(self, host, job_id):
@@ -565,6 +597,7 @@ class PBS:
         else:
             host.cmd('qstat ' + job_id)
         return
+
 
 if __name__ == "__main__":
     print(this_dir)
