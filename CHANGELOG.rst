@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.15
+=============
+
+- Added `--rsync` option to `pbsdeploy` command
+
 Version 0.1.14
 =============
 

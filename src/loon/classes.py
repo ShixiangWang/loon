@@ -539,7 +539,7 @@ class PBS:
                         sys.exit(1)
         return filelist
 
-    def deploy(self, host, source, destination, _logger):
+    def deploy(self, host, source, destination, _logger, use_rsync=False):
         """Deploy target directory on the active remote host
         
         Upload the target destination and then submit all *.pbs files
@@ -549,7 +549,7 @@ class PBS:
         if not isdir(source):
             print("Error: directory %s does not exist"%source)
             sys.exit(1)
-        host.upload(source, destination, _logger)
+        host.upload(source, destination, _logger, use_rsync=use_rsync)
         self.sub(
             host, 
             destination + '/*.pbs', 

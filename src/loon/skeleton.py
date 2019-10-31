@@ -290,7 +290,7 @@ def parse_args(args):
       help="Tasks to submit, can be a directory containing only tasks"
     )
 
-    # Create the parser for the "deploy" command
+    # Create the parser for the "pbsdeploy" command
     parser_deploy = subparsers.add_parser(
       'pbsdeploy',
       help='Deploy target destination to remote host',
@@ -304,6 +304,11 @@ def parse_args(args):
       'destination',
       help="Local destination directory, note '~' should be quoted in some cases",
       nargs='?'
+    )
+    parser_deploy.add_argument(
+      '--rsync',
+      help="Use rsync instead of scp",
+      action='store_true'
     )
 
     # Create the parser for the "pbscheck" command
@@ -464,7 +469,8 @@ def main(args):
         host,
         args.target,
         args.destination, 
-        _logger=_logger
+        _logger=_logger,
+        use_rsync=use_rsync
       )
     elif args.subparsers_name == 'pbscheck':
       _logger.info("pbscheck command is detected.")

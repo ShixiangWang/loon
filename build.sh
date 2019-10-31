@@ -1,5 +1,10 @@
 #!/bin/bash
 # Build new version automatically
+# Usage:
+#   ./build.sh python old_version new_version
+#
+# Use 'python3' if python is access to python2
+
 py=$1
 old_version=$2
 new_version=$3
