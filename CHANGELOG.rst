@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.14
+=============
+
+- Fixed bug about `rsync` attribute checking
+
 Version 0.1.13
 =============
 

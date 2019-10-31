@@ -350,8 +350,8 @@ def main(args):
     _logger.info("Starting loon...")
     host = Host()
     pbs = PBS()
-    
-    if args.rsync:
+
+    if hasattr(args, 'rsync'):
       use_rsync = True
     else:
       use_rsync = False
