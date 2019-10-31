@@ -295,7 +295,7 @@ class Host:
         # Return a list containing output from commands 
         return datalist
 
-    def upload(self, source, destination, _logger):
+    def upload(self, source, destination, _logger, use_rsync=False):
         """Upload files to active remote host.
 
         Currently, it is dependent on scp command.
@@ -305,17 +305,38 @@ class Host:
             destination [(str)]: destination directory in remote host
         """
         username, host, port = self.active_host[1:]
-        cmds = "scp -pr -P {port} {source} {username}@{host}:{destination}".format(port=port, source=' '.join(map(os.path.expanduser, source)), username=username, host=host, destination=destination)
+        # Make sure scp/rsync recognize destination as directory
+        # Path must end with '/'
+        if list(destination)[-1] != '/':
+            destination = destination + '/'
+        if use_rsync:
+            cmds = "rsync -azP -e 'ssh -p {port}' {source} {username}@{host}:{destination}".format(
+                port=port, 
+                source=' '.join(map(os.path.expanduser, source)), 
+                username=username, 
+                host=host, 
+                destination=destination)
+        else:
+            cmds = "scp -pr -P {port} {source} {username}@{host}:{destination}".format(
+                port=port, 
+                source=' '.join(map(os.path.expanduser, source)),
+                username=username,
+                host=host, 
+                destination=destination)
         print("=> Starting upload...", end="\n\n")
         now = datetime.now()  
         _logger.info("Running " + cmds)
-        run(cmds, shell=True)
+        run_res = run(cmds, shell=True)
+        _logger.info("Status code: " + str(run_res.returncode))
+        if run_res.returncode != 0:
+            print("Error: some error occurred, please check the info!")
+            sys.exit(run_res.returncode)
         taken = datetime.now() - now
         print("\n=> Finished uploading in %ss" %taken.seconds)
         return
      
         
-    def download(self, source, destination, _logger):
+    def download(self, source, destination, _logger, use_rsync=False):
         """Download files to local machine from active remote host.
         
         Currently, it is dependent on scp command.
@@ -327,12 +348,32 @@ class Host:
         username, host, port = self.active_host[1:]
         if not isdir(os.path.expanduser(destination)):
             os.makedirs(os.path.expanduser(destination))
+        # Make sure scp/rsync recognize destination as directory
+        # Path must end with '/'
+        if list(destination)[-1] != '/':
+            destination = destination + '/'
         print("=> Starting downloading...", end="\n\n")
         now = datetime.now()  
-        for i in source:
-            cmds = "scp -pr -P {port} {username}@{host}:{source} {destination}".format(port=port, source=i, username=username, host=host, destination=os.path.expanduser(destination))
-            _logger.info("==> Running " + cmds)
-            run(cmds)
+        if use_rsync:
+            cmds = "rsync -azP -e 'ssh -p {port}' {username}@{host}:'{source}' {destination}".format(
+                port=port, 
+                source=' '.join(source), 
+                username=username, 
+                host=host, 
+                destination=os.path.expanduser(destination))
+        else:
+            cmds = "scp -pr -P {port} {username}@{host}:'{source}' {destination}".format(
+                port=port, 
+                source=' '.join(source), 
+                username=username, 
+                host=host, 
+                destination=os.path.expanduser(destination))
+        _logger.info("Running " + cmds)
+        run_res = run(cmds, shell=True)
+        _logger.info("Status code: " + str(run_res.returncode))
+        if run_res.returncode != 0:
+            print("Error: some error occurred, please check the info!")
+            sys.exit(run_res.returncode)
         taken = datetime.now() - now
         print("\n=> Finished downloading in %ss" %taken.seconds)
         return
@@ -492,7 +533,7 @@ class PBS:
                         filelist.append(f)
                         cmds = 'cd ' + workdir + ';qsub ' + f
                         _logger.info(cmds)
-                        run(cmds)
+                        run(cmds, shell=True)
                     else:
                         print('Error: file %s does not exist.'%f)
                         sys.exit(1)

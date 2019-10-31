@@ -184,11 +184,16 @@ def parse_args(args):
     )
     parser_upload.add_argument(
       'destination',
-      help="Remote destination directory, note '~' should be quoted in some cases",
+      help="Remote destination directory",
       type=str
     )
+    parser_upload.add_argument(
+      '--rsync',
+      help="Use rsync instead of scp",
+      action='store_true'
+    )
 
-    # Create the parser for the "upload" command
+    # Create the parser for the "download" command
     parser_download = subparsers.add_parser(
       'download',
       help='Download files from active remote host',
@@ -203,6 +208,11 @@ def parse_args(args):
       'destination',
       help="Local destination directory, note '~' should be quoted in some cases",
       type=str
+    )
+    parser_download.add_argument(
+      '--rsync',
+      help="Use rsync instead of scp",
+      action='store_true'
     )
 
     # Create the parser for the "pbstemp" command
@@ -340,6 +350,11 @@ def main(args):
     _logger.info("Starting loon...")
     host = Host()
     pbs = PBS()
+    
+    if args.rsync:
+      use_rsync = True
+    else:
+      use_rsync = False
 
     # Deparse arguments
     if args.subparsers_name == 'add':
@@ -408,14 +423,16 @@ def main(args):
       host.upload(
         args.source, 
         args.destination,
-        _logger=_logger)
+        _logger=_logger,
+        use_rsync=use_rsync)
     elif args.subparsers_name == 'download':
       _logger.info("Download command is detected.")
       #host.connect(open_channel=False)
       host.download(
         args.source, 
         args.destination,
-        _logger=_logger)
+        _logger=_logger,
+        use_rsync=use_rsync)
     elif args.subparsers_name == 'pbstemp':
       _logger.info("pbstemp command is detected.")
       pbs.gen_template(

@@ -166,23 +166,27 @@ You can include data directory using `--data` flag, specify program like `bash` 
 
 - Upload and download files 
 
-Use them like `cp` command.
+Use them like `cp` command. At default, use `scp` command to do the job, set `--rsync` to use `rsync` command.
 
 ```shell
 $ loon upload -h
-usage: loon upload [-h] [-v] source [source ...] destination
+usage: loon upload [-h] [-v] [--rsync] source [source ...] destination
 
 positional arguments:
   source         Source files to upload
-  destination    Remote destination directory, note '~' should be quoted in
-                 some cases
+  destination    Remote destination directory
+
+optional arguments:
+  -h, --help     show this help message and exit
+  -v, --verbose  set loglevel to INFO
+  --rsync        Use rsync instead of scp
 
 optional arguments:
   -h, --help     show this help message and exit
   -v, --verbose  set loglevel to INFO
 
 $ loon download -h
-usage: loon download [-h] [-v] source [source ...] destination
+usage: loon download [-h] [-v] [--rsync] source [source ...] destination
 
 positional arguments:
   source         Source files to download
@@ -192,6 +196,7 @@ positional arguments:
 optional arguments:
   -h, --help     show this help message and exit
   -v, --verbose  set loglevel to INFO
+  --rsync        Use rsync instead of scp
 ```
 
 ### PBS management and tasks
@@ -200,6 +205,7 @@ optional arguments:
 * `pbsgen`  - Generate a batch of PBS files
 * `pbsgen_example` - Generate example files for pbsgen command
 * `pbssub` - Submit PBS tasks
+* `pbsdeploy` - Upload a target directory and submit containing PBS files (have `.pbs` extension)
 * `pbscheck` - Check status of PBS job on remote host
 
 More details please see `-h` option of the commands above.
@@ -208,18 +214,18 @@ More details please see `-h` option of the commands above.
 
 ```shell
 usage: loon [-h] [--version] [--author]
-            {add,delete,switch,list,rename,run,upload,download,pbstemp,pbsgen,pbsgen_example,pbssub,pbscheck}
+            {add,delete,switch,list,rename,run,upload,download,pbstemp,pbsgen,pbsgen_example,pbssub,pbsdeploy,pbscheck}
             ...
 
 Be an efficient loon.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --version             show program's version number and exit
+  --version             show program's version number and exit        
   --author              show info of program's author
 
 subcommands:
-  {add,delete,switch,list,rename,run,upload,download,pbstemp,pbsgen,pbsgen_example,pbssub,pbscheck}
+  {add,delete,switch,list,rename,run,upload,download,pbstemp,pbsgen,pbsgen_example,pbssub,pbsdeploy,pbscheck}
                         description
     add                 Add a remote host
     delete              Delete a remote host
@@ -228,11 +234,12 @@ subcommands:
     rename              Rename host alias
     run                 Run commands or scripts on remote
     upload              Upload files to active remote host
-    download            Download files from active remote host
+    download            Download files from active remote host        
     pbstemp             Generate a PBS template file
     pbsgen              Generate a batch of PBS files
-    pbsgen_example      Generate example files for pbsgen command
+    pbsgen_example      Generate example files for pbsgen command     
     pbssub              Submit PBS tasks
+    pbsdeploy           Deploy target destination to remote host      
     pbscheck            Check status of PBS job on remote host
 ```
 

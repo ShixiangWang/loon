@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Version 0.1.13
+=============
+
+- Fixed some bugs
+- Added `--rsync` option to `upload` and `download` commands, fixed #10
+- Added status code checking to `upload` and `download` commands
+
 Version 0.1.12
 =============
 
