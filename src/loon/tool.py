@@ -15,7 +15,7 @@ def batch(input, cmds, sep=',', header=False, dry_run=False, _logger=None):
         sys.exit(1)
 
     data = read_csv(input, sep=sep, rm_comment=True)
-    if not header:
+    if header:
         # Remove header
         _ = data.pop(0)
 

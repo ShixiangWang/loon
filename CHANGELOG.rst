@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.19
+=============
+
+- Fixed `header` bug for `batch` command
+
 Version 0.1.18
 =============
 

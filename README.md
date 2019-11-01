@@ -205,14 +205,16 @@ By providing a structed file (CSV, TSV etc) and a sample command with placeholde
 
 ```shell
 $ loon batch -f src/loon/data/samplefile.csv 'echo hello {0}'
+=> Running echo hello TCGA-2A-A8VO-01
+hello TCGA-2A-A8VO-01
 => Running echo hello TCGA-2A-A8VT-01
 hello TCGA-2A-A8VT-01
 => Running echo hello TCGA-2A-A8VV-01
 hello TCGA-2A-A8VV-01
 => Running echo hello TCGA-2A-A8VX-01
 hello TCGA-2A-A8VX-01
-
 $ loon batch -f src/loon/data/samplefile.csv 'echo hello {0}' --dry
+=> Running echo hello TCGA-2A-A8VO-01
 => Running echo hello TCGA-2A-A8VT-01
 => Running echo hello TCGA-2A-A8VV-01
 => Running echo hello TCGA-2A-A8VX-01
