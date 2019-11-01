@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.18
+=============
+
+- Added documentation for `batch` command
+
 Version 0.1.17
 =============
 

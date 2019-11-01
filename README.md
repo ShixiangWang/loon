@@ -199,6 +199,25 @@ optional arguments:
   --rsync        Use rsync instead of scp
 ```
 
+- Batch process commands
+
+By providing a structed file (CSV, TSV etc) and a sample command with placeholders `{index}` refer to column index (0 based) of file, `batch` command can be used to execute a batch of commands. Users can use `--dry` flag to dry run the code.
+
+```shell
+$ loon batch -f src/loon/data/samplefile.csv 'echo hello {0}'
+=> Running echo hello TCGA-2A-A8VT-01
+hello TCGA-2A-A8VT-01
+=> Running echo hello TCGA-2A-A8VV-01
+hello TCGA-2A-A8VV-01
+=> Running echo hello TCGA-2A-A8VX-01
+hello TCGA-2A-A8VX-01
+
+$ loon batch -f src/loon/data/samplefile.csv 'echo hello {0}' --dry
+=> Running echo hello TCGA-2A-A8VT-01
+=> Running echo hello TCGA-2A-A8VV-01
+=> Running echo hello TCGA-2A-A8VX-01
+```
+
 ### PBS management and tasks
 
 * `pbstemp` - Generate a PBS template file
@@ -214,18 +233,18 @@ More details please see `-h` option of the commands above.
 
 ```shell
 usage: loon [-h] [--version] [--author]
-            {add,delete,switch,list,rename,run,upload,download,pbstemp,pbsgen,pbsgen_example,pbssub,pbsdeploy,pbscheck}
+            {add,delete,switch,list,rename,run,upload,download,batch,pbstemp,pbsgen,pbsgen_example,pbssub,pbsdeploy,pbscheck}
             ...
 
 Be an efficient loon.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --version             show program's version number and exit        
+  --version             show program's version number and exit
   --author              show info of program's author
 
 subcommands:
-  {add,delete,switch,list,rename,run,upload,download,pbstemp,pbsgen,pbsgen_example,pbssub,pbsdeploy,pbscheck}
+  {add,delete,switch,list,rename,run,upload,download,batch,pbstemp,pbsgen,pbsgen_example,pbssub,pbsdeploy,pbscheck}
                         description
     add                 Add a remote host
     delete              Delete a remote host
@@ -234,12 +253,13 @@ subcommands:
     rename              Rename host alias
     run                 Run commands or scripts on remote
     upload              Upload files to active remote host
-    download            Download files from active remote host        
+    download            Download files from active remote host
+    batch               Batch process commands with placeholders
     pbstemp             Generate a PBS template file
     pbsgen              Generate a batch of PBS files
-    pbsgen_example      Generate example files for pbsgen command     
+    pbsgen_example      Generate example files for pbsgen command
     pbssub              Submit PBS tasks
-    pbsdeploy           Deploy target destination to remote host      
+    pbsdeploy           Deploy target destination to remote host
     pbscheck            Check status of PBS job on remote host
 ```
 
