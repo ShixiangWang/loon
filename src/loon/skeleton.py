@@ -13,9 +13,11 @@ import logging
 if __package__ == '' or __package__ is None:    # Use for test
     from __init__ import __version__, __author__, __license__
     from classes import Host, PBS
+    from tool import batch
 else:
     from loon import __version__, __author__, __license__
     from loon.classes import Host, PBS
+    from loon.tool import batch
 
 _logger = logging.getLogger(__name__)
 
@@ -188,6 +190,34 @@ def parse_args(args):
     parser_download.add_argument('--rsync',
                                  help="Use rsync instead of scp",
                                  action='store_true')
+
+    # Create the parser for the "batch" command
+    parser_batch = subparsers.add_parser(
+        'batch',
+        help="Batch process commands with placeholders",
+        parents=[verbose_parser])
+    parser_batch.add_argument(
+        '-f',
+        '--file',
+        help=
+        r'A structed file like CSV, TSV etc. Each column is placeholder target, i.e. {0} targets the first column, {1} targets the second column, etc.',
+        type=str,
+        required=True)
+    parser_batch.add_argument(
+        '-s',
+        '--sep',
+        help=r"File separator, ',' for CSV (default) and '\t' for TSV",
+        default=',',
+        required=False)
+    parser_batch.add_argument('--header',
+                              help="Set it if input file contains header",
+                              action='store_true')
+    parser_batch.add_argument('--dry',
+                              help="Dry run the commands",
+                              action='store_true')
+    parser_batch.add_argument('cmds',
+                              type=str,
+                              help="A sample command with placeholders")
 
     # Create the parser for the "pbstemp" command
     parser_pbstemp = subparsers.add_parser('pbstemp',
@@ -387,6 +417,14 @@ def main(args):
                       args.destination,
                       _logger=_logger,
                       use_rsync=use_rsync)
+    elif args.subparsers_name == 'batch':
+        _logger.info("Batch command is detected.")
+        batch(args.file,
+              args.cmds,
+              sep=args.sep,
+              header=args.header,
+              dry_run=args.dry,
+              _logger=_logger)
     elif args.subparsers_name == 'pbstemp':
         _logger.info("pbstemp command is detected.")
         pbs.gen_template(args.input, args.output)
