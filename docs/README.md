@@ -201,18 +201,21 @@ optional arguments:
 
 - Batch process commands
 
-By providing a structed file (CSV, TSV etc) and a sample command with placeholders `{index}` refer to column index (0 based) of file, `batch` command can be used to execute a batch of commands. Users can use `--dry` flag to dry run the code.
+By providing a structed file (CSV, TSV etc) and a sample command with placeholders `{index}` refer to column index (0 based) of file, `batch` command can be used to execute a batch of commands. Users can set thread number by `-T` flag and use `--dry` flag to dry run the code.
 
 ```shell
 $ loon batch -f src/loon/data/samplefile.csv 'echo hello {0}'
-=> Running echo hello TCGA-2A-A8VO-01
 hello TCGA-2A-A8VO-01
-=> Running echo hello TCGA-2A-A8VT-01
 hello TCGA-2A-A8VT-01
-=> Running echo hello TCGA-2A-A8VV-01
 hello TCGA-2A-A8VV-01
-=> Running echo hello TCGA-2A-A8VX-01
 hello TCGA-2A-A8VX-01
+
+$ loon batch -f src/loon/data/samplefile.csv 'echo hello {0}' -T 4
+hello TCGA-2A-A8VO-01
+hello TCGA-2A-A8VT-01
+hello TCGA-2A-A8VV-01
+hello TCGA-2A-A8VX-01
+
 $ loon batch -f src/loon/data/samplefile.csv 'echo hello {0}' --dry
 => Running echo hello TCGA-2A-A8VO-01
 => Running echo hello TCGA-2A-A8VT-01

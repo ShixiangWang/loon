@@ -209,6 +209,12 @@ def parse_args(args):
         help=r"File separator, ',' for CSV (default) and '\t' for TSV",
         default=',',
         required=False)
+    parser_batch.add_argument('-T',
+                              '--thread',
+                              help="Thread number, default is 1",
+                              required=False,
+                              default=1,
+                              type=int)
     parser_batch.add_argument('--header',
                               help="Set it if input file contains header",
                               action='store_true')
@@ -422,6 +428,7 @@ def main(args):
         batch(args.file,
               args.cmds,
               sep=args.sep,
+              thread=args.thread,
               header=args.header,
               dry_run=args.dry,
               _logger=_logger)

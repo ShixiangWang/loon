@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.2.0
+=============
+
+- Added thread option to `batch` command
+
 Version 0.1.19
 =============
 
