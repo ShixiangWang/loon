@@ -1,0 +1,36 @@
+{% set name = "loon" %}
+{% set version = "0.2.1" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: cd60129039b62199a5e1e04024d03e8deae959662230e4d1d3659ddadc0cef94
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  host:
+    - pip
+    - python
+    - pyscaffold
+  run:
+    - python
+    - ssh2-python>=0.18
+
+about:
+  home: https://github.com/ShixiangWang/loon
+  license: mit
+  license_family: MIT
+  license_file: 
+  summary: "A Python toolkit for operating remote host based on SSH"
+  doc_url: https://github.com/ShixiangWang/loon
+  dev_url: https://github.com/ShixiangWang/loon
+
+extra:
+  recipe-maintainers:
+    - ShixiangWang
