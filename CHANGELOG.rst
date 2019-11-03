@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Version 0.2.1
+=============
+
+- Fixed a bug related to judgement of `--rsync` option
+- `--rsync` option is now disabled in Windows
+- git bash is removed from documentation due to its bad performance
+
 Version 0.2.0
 =============
 

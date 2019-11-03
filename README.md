@@ -7,8 +7,6 @@
 
 **loon** is a Python toolkit for operating remote host based on SSH. Idea for developing **loon** comes from [**sync-deploy**](https://github.com/ShixiangWang/sync-deploy), which is limited by its pure bash code. Therefore, I use Python to implement it and more features will be added to it in the future. 
 
-**For Windows users, software providing basic linux commands like `ssh` and `scp` is required, I recommend using [git bash](https://git-scm.com/downloads).**
-
 ## Installation
 
 Install from pypi:
@@ -166,7 +164,7 @@ You can include data directory using `--data` flag, specify program like `bash` 
 
 - Upload and download files 
 
-Use them like `cp` command. At default, use `scp` command to do the job, set `--rsync` to use `rsync` command.
+Use them like `cp` command. At default, use `scp` command to do the job, set `--rsync` to use `rsync` command (`--rsync` is disabled in Windows).
 
 ```shell
 $ loon upload -h

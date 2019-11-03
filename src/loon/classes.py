@@ -339,6 +339,9 @@ class Host:
         if list(destination)[-1] != '/':
             destination = destination + '/'
         if use_rsync:
+            if sys.platform == 'win32':
+                print("--rsync is disabled in Windows, please don't use it.")
+                sys.exit(0)
             cmds = "rsync -azP -e 'ssh -p {port}' {source} {username}@{host}:{destination}".format(
                 port=port,
                 source=' '.join(map(os.path.expanduser, source)),
@@ -358,7 +361,7 @@ class Host:
         run_res = run(cmds, shell=True)
         _logger.info("Status code: " + str(run_res.returncode))
         if run_res.returncode != 0:
-            print("Error: some error occurred, please check the info!")
+            print("Error: an error occurred, please check the info!")
             sys.exit(run_res.returncode)
         taken = datetime.now() - now
         print("\n=> Finished uploading in %ss" % taken.seconds)
@@ -383,6 +386,9 @@ class Host:
         print("=> Starting downloading...", end="\n\n")
         now = datetime.now()
         if use_rsync:
+            if sys.platform == 'win32':
+                print("--rsync is disabled in Windows, please don't use it.")
+                sys.exit(0)
             cmds = "rsync -azP -e 'ssh -p {port}' {username}@{host}:'{source}' {destination}".format(
                 port=port,
                 source=' '.join(source),
@@ -400,7 +406,7 @@ class Host:
         run_res = run(cmds, shell=True)
         _logger.info("Status code: " + str(run_res.returncode))
         if run_res.returncode != 0:
-            print("Error: some error occurred, please check the info!")
+            print("Error: an error occurred, please check the info!")
             sys.exit(run_res.returncode)
         taken = datetime.now() - now
         print("\n=> Finished downloading in %ss" % taken.seconds)

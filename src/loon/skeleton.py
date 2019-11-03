@@ -348,7 +348,7 @@ def main(args):
     host = Host()
     pbs = PBS()
 
-    if hasattr(args, 'rsync'):
+    if hasattr(args, 'rsync') and args.rsync:
         use_rsync = True
     else:
         use_rsync = False
