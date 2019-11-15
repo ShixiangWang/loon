@@ -452,8 +452,14 @@ class PBS:
         print("=> Done.")
         return
 
-    def gen_pbs(self, template, samplefile, mapfile, outdir, _logger):
-        """Generate a batch of PBS tasks based on template and mapping file"""
+    def gen_pbs(self,
+                template,
+                samplefile,
+                mapfile,
+                outdir,
+                _logger,
+                pbs_mode=True):
+        """Generate a batch of (script) files (PBS tasks) based on template and mapping file"""
         if not isdir(outdir):
             print("Directory %s does not exist, creating it" % outdir)
             os.makedirs(outdir)
@@ -466,7 +472,10 @@ class PBS:
 
         print("=====================")
         print("Output path : " + outdir)
-        print("PBS Template: " + template)
+        if pbs_mode:
+            print("PBS Template: " + template)
+        else:
+            print("Template: " + template)
         print("Sample file : " + samplefile)
         print("Mapping file: " + mapfile)
         print("=====================")
@@ -499,7 +508,10 @@ class PBS:
 
         print("Generating...")
         for row in sample_data:
-            pbsfile = os.path.join(outdir, row[0] + '.pbs')
+            if pbs_mode:
+                pbsfile = os.path.join(outdir, row[0] + '.pbs')
+            else:
+                pbsfile = os.path.join(outdir, row[0])
             _logger.info("Generating %s" % pbsfile)
             content = temp_data
             for i in map_data:

@@ -191,6 +191,28 @@ def parse_args(args):
                                  help="Use rsync instead of scp",
                                  action='store_true')
 
+    # Create the parser for the "gen" command
+    parser_gen = subparsers.add_parser(
+        'gen',
+        help='Generate a batch of (script) files',
+        parents=[verbose_parser])
+    parser_gen.add_argument('-t',
+                            '--template',
+                            help="A template file containing placeholders")
+    parser_gen.add_argument(
+        '-s',
+        '--samplefile',
+        help=
+        "A csv file containing unique filenames (the first column) and replacing labels"
+    )
+    parser_gen.add_argument(
+        '-m',
+        '--mapfile',
+        help=
+        "A csv file containing placeholders and column index (0-based) indicating replacing labels in samplefile"
+    )
+    parser_gen.add_argument('-o', '--output', help="Output directory")
+
     # Create the parser for the "batch" command
     parser_batch = subparsers.add_parser(
         'batch',
@@ -242,9 +264,10 @@ def parse_args(args):
                                 required=False)
 
     # Create the parser for the "pbsgen" command
-    parser_pbsgen = subparsers.add_parser('pbsgen',
-                                          help='Generate a batch of PBS files',
-                                          parents=[verbose_parser])
+    parser_pbsgen = subparsers.add_parser(
+        'pbsgen',
+        help='Generate a batch of PBS files (with .pbs extension)',
+        parents=[verbose_parser])
     parser_pbsgen.add_argument(
         '-t', '--template', help="A PBS template file containing placeholders")
     parser_pbsgen.add_argument(
@@ -435,6 +458,14 @@ def main(args):
     elif args.subparsers_name == 'pbstemp':
         _logger.info("pbstemp command is detected.")
         pbs.gen_template(args.input, args.output)
+    elif args.subparsers_name == 'gen':
+        _logger.info("gen command is detected.")
+        pbs.gen_pbs(args.template,
+                    args.samplefile,
+                    args.mapfile,
+                    args.output,
+                    _logger=_logger,
+                    pbs_mode=False)
     elif args.subparsers_name == 'pbsgen':
         _logger.info("pbsgen command is detected.")
         pbs.gen_pbs(args.template,

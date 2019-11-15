@@ -221,6 +221,32 @@ $ loon batch -f src/loon/data/samplefile.csv 'echo hello {0}' --dry
 => Running echo hello TCGA-2A-A8VX-01
 ```
 
+- Generate a batch of (script) files
+
+`gen` command is similar to the `pbsgen` command below, but removes the `.pbs` file extension,
+so users have to add the file extension in the first column of the SAMPLEFILE if necessary.
+
+The example files can be generated using `pbsgen_example`.
+
+```
+usage: loon gen [-h] [-v] [-t TEMPLATE] [-s SAMPLEFILE] [-m MAPFILE]
+                       [-o OUTPUT]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         set loglevel to INFO
+  -t TEMPLATE, --template TEMPLATE
+                        A template file containing placeholders
+  -s SAMPLEFILE, --samplefile SAMPLEFILE
+                        A csv file containing unique filenames (the first
+                        column) and replacing labels
+  -m MAPFILE, --mapfile MAPFILE
+                        A csv file containing placeholders and column index
+                        (0-based) indicating replacing labels in samplefile
+  -o OUTPUT, --output OUTPUT
+                        Output directory
+```
+
 ### PBS management and tasks
 
 * `pbstemp` - Generate a PBS template file
@@ -236,8 +262,8 @@ More details please see `-h` option of the commands above.
 
 ```shell
 usage: loon [-h] [--version] [--author]
-            {add,delete,switch,list,rename,run,upload,download,batch,pbstemp,pbsgen,pbsgen_example,pbssub,pbsdeploy,pbscheck}
-            ...
+                   {add,delete,switch,list,rename,run,upload,download,gen,batch,pbstemp,pbsgen,pbsgen_example,pbssub,pbsdeploy,pbscheck}
+                   ...
 
 Be an efficient loon.
 
@@ -247,7 +273,7 @@ optional arguments:
   --author              show info of program's author
 
 subcommands:
-  {add,delete,switch,list,rename,run,upload,download,batch,pbstemp,pbsgen,pbsgen_example,pbssub,pbsdeploy,pbscheck}
+  {add,delete,switch,list,rename,run,upload,download,gen,batch,pbstemp,pbsgen,pbsgen_example,pbssub,pbsdeploy,pbscheck}
                         description
     add                 Add a remote host
     delete              Delete a remote host
@@ -257,9 +283,10 @@ subcommands:
     run                 Run commands or scripts on remote
     upload              Upload files to active remote host
     download            Download files from active remote host
+    gen                 Generate a batch of (script) files
     batch               Batch process commands with placeholders
     pbstemp             Generate a PBS template file
-    pbsgen              Generate a batch of PBS files
+    pbsgen              Generate a batch of PBS files (with .pbs extension)
     pbsgen_example      Generate example files for pbsgen command
     pbssub              Submit PBS tasks
     pbsdeploy           Deploy target destination to remote host
