@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.2.2
+=============
+
+- Add `gen` command, fix #14
+
 Version 0.2.1
 =============
 
