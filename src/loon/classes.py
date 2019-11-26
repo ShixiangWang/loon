@@ -135,7 +135,7 @@ class Host:
         host2switch = self.host_check(name, username, host, port)
         self.active_host = host2switch
         self.save_hosts()
-        print("=> Activated.")
+        print("=> %s activated." %name)
         return
 
     def rename(self, old, new):
@@ -307,7 +307,7 @@ class Host:
         size, errinfo = self.channel.read_stderr()
         if size > 0:
             print('An error is raised by remote host, please read the info:\n')
-            print(errinfo.decode('utf-8', errors='ignore'), end="")
+            print(errinfo.decode('utf-8', errors='replace'), end="")
             sys.exit(1)
         else:
             # Get output
@@ -317,7 +317,7 @@ class Host:
             while size > 0:
                 data = data.decode('utf-8', errors='ignore')
                 if print_info:
-                    print(data, end='')
+                    print(data, sep='', end='')
                 datalist.append(data)
                 size, data = self.channel.read()
 
@@ -436,11 +436,11 @@ class PBS:
             with io.open(output, 'w', encoding='utf-8', newline='\n') as f:
                 with open(self.tmp_header, 'r') as header:
                     for i in header:
-                        print(i, file=f, end="")
+                        print(i, file=f, sep='', end="")
             with io.open(output, 'a', encoding='utf-8', newline='\n') as f:
                 with open(self.tmp_cmds, 'r') as cmds:
                     for i in cmds:
-                        print(i, file=f, end="")
+                        print(i, file=f, sep='', end="")
         else:
             if not isfile(input):
                 print("Error: cannot find the template file.")
@@ -448,7 +448,7 @@ class PBS:
             with io.open(output, 'w', encoding='utf-8', newline='\n') as f:
                 with open(input, 'r') as inf:
                     for i in inf:
-                        print(i, file=f, end="")
+                        print(i, file=f, sep='', end="")
         print("=> Done.")
         return
 
