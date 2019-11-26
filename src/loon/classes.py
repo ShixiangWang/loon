@@ -307,7 +307,7 @@ class Host:
         size, errinfo = self.channel.read_stderr()
         if size > 0:
             print('An error is raised by remote host, please read the info:\n')
-            print(errinfo.decode('utf-8', errors='replace'), end="")
+            print(errinfo.decode('utf-8', errors='ignore'), end="")
             sys.exit(1)
         else:
             # Get output
@@ -315,7 +315,7 @@ class Host:
             size, data = self.channel.read()
             # Here data is byte type
             while size > 0:
-                data = data.decode('utf-8', errors='replace')
+                data = data.decode('utf-8', errors='ignore')
                 if print_info:
                     print(data, end='')
                 datalist.append(data)
