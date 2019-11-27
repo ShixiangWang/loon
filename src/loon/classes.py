@@ -355,6 +355,7 @@ class Host:
                 username=username,
                 host=host,
                 destination=destination)
+                    
         print("=> Starting upload...", end="\n\n")
         now = datetime.now()
         _logger.info("Running " + cmds)
@@ -604,6 +605,7 @@ class PBS:
         if not isdir(source):
             print("Error: directory %s does not exist" % source)
             sys.exit(1)
+        source = [source]
         host.upload(source, destination, _logger, use_rsync=use_rsync)
         self.sub(host, destination + '/*.pbs', True, destination, _logger)
         return
