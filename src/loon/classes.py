@@ -608,7 +608,7 @@ class PBS:
             sys.exit(1)
         source = [source]
         host.upload(source, destination, _logger, use_rsync=use_rsync)
-        self.sub(host, destination + '/*.pbs', True, destination, _logger)
+        self.sub(host, [destination + '/*.pbs'], True, destination, _logger)
         return
 
     def check(self, host, job_id):
