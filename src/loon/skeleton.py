@@ -308,7 +308,7 @@ def parse_args(args):
     parser_pbssub.add_argument(
         nargs='+',
         dest='tasks',
-        help="Tasks to submit, can be a directory containing only tasks")
+        help="Tasks to submit, can be a directory containing only PBS files")
 
     # Create the parser for the "pbsdeploy" command
     parser_deploy = subparsers.add_parser(

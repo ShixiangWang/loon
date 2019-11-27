@@ -562,7 +562,9 @@ class PBS:
             _logger.info('ls -p ' + tasks)
             host.channel.execute('ls -p ' + tasks)
             filelist = host.get_result(print_info=False)[0].split('\n')
-            filelist.remove('')
+            _logger.info(filelist)
+            if '' in filelist:
+                filelist.remove('')
             fl_bk = filelist.copy()
             for f in fl_bk:
                 if len(f) > 1 and (f[-1] == '/' or f[-1] == ':'):
