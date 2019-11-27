@@ -209,6 +209,9 @@ class Host:
             data_dir ([str]): a path representing data directory
             remote_file ([bool]): if `True`, collect input from remote host instead of local machine
             dir ([str]): Remote directory for storing local scripts
+
+        Returns:
+            A string containing result information
         """
         if not run_file:
             self.connect()
@@ -232,8 +235,9 @@ class Host:
                     commands_1 = ';'.join(commands_1)
                     self.connect()
                     self.channel.execute(commands_1)
-                    scripts = self.get_result(print_info=False)[0].split('\n')
-                    scripts.remove('')
+                    scripts = self.get_result(print_info=False).split('\n')
+                    if '' in scripts:
+                        scripts.remove('')
                 if prog is None:
                     commands_1 = list(map(lambda x: 'chmod u+x ' + x, scripts))
                     commands_1 = ';'.join(commands_1)
@@ -300,7 +304,8 @@ class Host:
                 self.channel.execute(commands)
 
         datalist = self.get_result()
-        return datalist
+        # Return a string containing output
+        return "".join(datalist)
 
     def get_result(self, print_info=True):
         """Get result from executed channel"""
@@ -321,8 +326,8 @@ class Host:
                 datalist.append(data)
                 size, data = self.channel.read()
 
-        # Return a list containing output from commands
-        return datalist
+        # Return a string containing output from commands
+        return "".join(datalist)
 
     def upload(self, source, destination, _logger, use_rsync=False):
         """Upload files to active remote host.
@@ -557,12 +562,10 @@ class PBS:
         filelist = []
         if remote:
             tasks = ' '.join(tasks)
-            #filelist = host.cmd('ls %s'%tasks)
             host.connect()
             _logger.info('ls -p ' + tasks)
             host.channel.execute('ls -p ' + tasks)
-            filelist = host.get_result(print_info=False)[0].split('\n')
-            _logger.info(filelist)
+            filelist = host.get_result(print_info=False).split('\n')
             if '' in filelist:
                 filelist.remove('')
             fl_bk = filelist.copy()
@@ -616,11 +619,9 @@ class PBS:
     def check(self, host, job_id):
         """Check PBS task status"""
         if job_id is None:
-            host.cmd('qstat')
+            return host.cmd('qstat')
         else:
-            host.cmd('qstat ' + job_id)
-        return
-
+            return host.cmd('qstat ' + job_id)
 
 if __name__ == "__main__":
     print(this_dir)
