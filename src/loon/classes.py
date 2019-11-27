@@ -135,7 +135,7 @@ class Host:
         host2switch = self.host_check(name, username, host, port)
         self.active_host = host2switch
         self.save_hosts()
-        print("=> %s activated." %name)
+        print("=> %s activated." % name)
         return
 
     def rename(self, old, new):
@@ -622,6 +622,7 @@ class PBS:
             return host.cmd('qstat')
         else:
             return host.cmd('qstat ' + job_id)
+
 
 if __name__ == "__main__":
     print(this_dir)

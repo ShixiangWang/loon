@@ -315,8 +315,8 @@ def parse_args(args):
         'pbsdeploy',
         help='Deploy target destination to remote host',
         parents=[verbose_parser])
-    parser_deploy.add_argument('target',
-                               help='Target directory containing PBS files and more')
+    parser_deploy.add_argument(
+        'target', help='Target directory containing PBS files and more')
     parser_deploy.add_argument(
         'destination',
         help=

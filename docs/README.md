@@ -1,6 +1,12 @@
 # loon - A Python toolkit for operating remote host
 
-![GitHub repo size](https://img.shields.io/github/repo-size/ShixiangWang/loon) [![PyPI](https://img.shields.io/pypi/v/loon?color=blue)](https://pypi.org/project/loon/) [![Documentation Status](https://readthedocs.org/projects/loon/badge/?version=latest)](https://loon.readthedocs.io/en/latest/?badge=latest) ![PyPI - Downloads](https://img.shields.io/pypi/dm/loon) [![GitHub issues](https://img.shields.io/github/issues-raw/ShixiangWang/loon)](https://github.com/ShixiangWang/loon/issues?q=is%3Aopen+is%3Aissue) [![GitHub last commit](https://img.shields.io/github/last-commit/ShixiangWang/loon)](https://github.com/ShixiangWang/loon/commits/master) 
+![GitHub repo size](https://img.shields.io/github/repo-size/ShixiangWang/loon) 
+[![PyPI](https://img.shields.io/pypi/v/loon?color=blue)](https://pypi.org/project/loon/) 
+[![Documentation Status](https://readthedocs.org/projects/loon/badge/?version=latest)](https://loon.readthedocs.io/en/latest/?badge=latest) 
+![PyPI - Downloads](https://img.shields.io/pypi/dm/loon) 
+[![HitCount](http://hits.dwyl.io/ShixiangWang/loon.svg)](http://hits.dwyl.io/ShixiangWang/loon)
+[![GitHub issues](https://img.shields.io/github/issues-raw/ShixiangWang/loon)](https://github.com/ShixiangWang/loon/issues?q=is%3Aopen+is%3Aissue) 
+[![GitHub last commit](https://img.shields.io/github/last-commit/ShixiangWang/loon)](https://github.com/ShixiangWang/loon/commits/master) 
 
 
 ## Description

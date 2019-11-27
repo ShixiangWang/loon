@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.2.3
+=============
+
+- Fix some bugs about PBS feature
+
 Version 0.2.2
 =============
 
