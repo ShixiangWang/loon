@@ -355,7 +355,7 @@ class Host:
                 username=username,
                 host=host,
                 destination=destination)
-                    
+
         print("=> Starting upload...", end="\n\n")
         now = datetime.now()
         _logger.info("Running " + cmds)
@@ -559,6 +559,7 @@ class PBS:
             tasks = ' '.join(tasks)
             #filelist = host.cmd('ls %s'%tasks)
             host.connect()
+            _logger.info('ls -p ' + tasks)
             host.channel.execute('ls -p ' + tasks)
             filelist = host.get_result(print_info=False)[0].split('\n')
             filelist.remove('')
