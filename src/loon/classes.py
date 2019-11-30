@@ -230,6 +230,7 @@ class Host:
         """
         if dry_run:
             print("Running", "files:" if run_file else "commands:", commands)
+            sys.exit(0)
         if not run_file:
             self.connect()
             self.channel.execute(commands)
@@ -362,8 +363,8 @@ class Host:
         """
         username, host, port = self.active_host[1:]
         if dry_run:
-            print("Running upload", source, "to", destination, "on",
-                  self.active_host[1:])
+            print("Running upload", ' '.join(source), "to", destination, "on",
+                  tuple(self.active_host[1:]))
             sys.exit(0)
         # Make sure scp/rsync recognize destination as directory
         # Path must end with '/'
@@ -415,8 +416,8 @@ class Host:
         """
         username, host, port = self.active_host[1:]
         if dry_run:
-            print("Running download", source, "to", destination, "from",
-                  self.active_host[1:])
+            print("Running download", ' '.join(source), "to", destination,
+                  "from", tuple(self.active_host[1:]))
             sys.exit(0)
         if not isdir(os.path.expanduser(destination)):
             os.makedirs(os.path.expanduser(destination))

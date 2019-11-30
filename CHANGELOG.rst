@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.3.0-0.3.1
+=============
+
+- Add `--dry` to all commands
+
 Version 0.2.3
 =============
 
