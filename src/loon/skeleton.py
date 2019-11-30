@@ -46,7 +46,7 @@ def parse_args(args):
         version="Author: 王诗翔 Email: w_shixiang@163.com GitHub: @{author}".
         format(author=__author__))
 
-    # Common arguments
+    # Common arguments for host
     host_parent_parser = argparse.ArgumentParser(add_help=False)
     host_parent_parser.add_argument(
         '-N',
@@ -72,6 +72,7 @@ def parse_args(args):
                                     type=int,
                                     default=22)
 
+    # Common arguments for all commands
     verbose_parser = argparse.ArgumentParser(add_help=False)
     verbose_parser.add_argument("-v",
                                 "--verbose",
@@ -79,6 +80,9 @@ def parse_args(args):
                                 help="set loglevel to INFO",
                                 action="store_const",
                                 const=logging.INFO)
+    verbose_parser.add_argument('--dry',
+                                help="Dry run the commands",
+                                action='store_true')
 
     # Subcommands
     subparsers = parser.add_subparsers(
@@ -240,9 +244,6 @@ def parse_args(args):
     parser_batch.add_argument('--header',
                               help="Set it if input file contains header",
                               action='store_true')
-    parser_batch.add_argument('--dry',
-                              help="Dry run the commands",
-                              action='store_true')
     parser_batch.add_argument('cmds',
                               type=str,
                               help="A sample command with placeholders")
@@ -387,12 +388,14 @@ def main(args):
         host.add(name=args.name,
                  username=args.username,
                  host=args.host,
-                 port=args.port)
+                 port=args.port,
+                 dry_run=args.dry)
         if args.switch_active:
             host.switch(name=args.name,
                         username=args.username,
                         host=args.host,
-                        port=args.port)
+                        port=args.port,
+                        dry_run=args.dry)
     elif args.subparsers_name == 'delete':
         _logger.info("Delete command is detected.")
         if args.username is None or args.host is None:
@@ -402,7 +405,8 @@ def main(args):
         host.delete(name=args.name,
                     username=args.username,
                     host=args.host,
-                    port=args.port)
+                    port=args.port,
+                    dry_run=args.dry)
     elif args.subparsers_name == 'switch':
         _logger.info("Switch command is detected.")
         if args.username is None or args.host is None:
@@ -412,13 +416,14 @@ def main(args):
         host.switch(name=args.name,
                     username=args.username,
                     host=args.host,
-                    port=args.port)
+                    port=args.port,
+                    dry_run=args.dry)
     elif args.subparsers_name == 'list':
         _logger.info("List command is detected.")
         host.list()
     elif args.subparsers_name == 'rename':
         _logger.info("Rename command is detected.")
-        host.rename(args.old, args.new)
+        host.rename(args.old, args.new, dry_run=args.dry)
     elif args.subparsers_name == 'run':
         _logger.info("Run command is detected.")
         if args.run_file:
@@ -431,21 +436,24 @@ def main(args):
                  data_dir=args.data,
                  remote_file=args.remote_file,
                  dir=args.dir,
-                 prog=args.prog)
+                 prog=args.prog,
+                 dry_run=args.dry)
     elif args.subparsers_name == 'upload':
         _logger.info("Upload command is detected.")
         #host.connect(open_channel=False)
         host.upload(args.source,
                     args.destination,
                     _logger=_logger,
-                    use_rsync=use_rsync)
+                    use_rsync=use_rsync,
+                    dry_run=args.dry)
     elif args.subparsers_name == 'download':
         _logger.info("Download command is detected.")
         #host.connect(open_channel=False)
         host.download(args.source,
                       args.destination,
                       _logger=_logger,
-                      use_rsync=use_rsync)
+                      use_rsync=use_rsync,
+                      dry_run=args.dry)
     elif args.subparsers_name == 'batch':
         _logger.info("Batch command is detected.")
         batch(args.file,
@@ -457,7 +465,7 @@ def main(args):
               _logger=_logger)
     elif args.subparsers_name == 'pbstemp':
         _logger.info("pbstemp command is detected.")
-        pbs.gen_template(args.input, args.output)
+        pbs.gen_template(args.input, args.output, dry_run=args.dry)
     elif args.subparsers_name == 'gen':
         _logger.info("gen command is detected.")
         pbs.gen_pbs(args.template,
@@ -465,33 +473,37 @@ def main(args):
                     args.mapfile,
                     args.output,
                     _logger=_logger,
-                    pbs_mode=False)
+                    pbs_mode=False,
+                    dry_run=args.dry)
     elif args.subparsers_name == 'pbsgen':
         _logger.info("pbsgen command is detected.")
         pbs.gen_pbs(args.template,
                     args.samplefile,
                     args.mapfile,
                     args.output,
-                    _logger=_logger)
+                    _logger=_logger,
+                    dry_run=args.dry)
     elif args.subparsers_name == 'pbsgen_example':
-        pbs.gen_pbs_example(args.output, _logger=_logger)
+        pbs.gen_pbs_example(args.output, _logger=_logger, dry_run=args.dry)
     elif args.subparsers_name == 'pbssub':
         _logger.info("pbssub command is detected.")
         pbs.sub(host,
                 args.tasks,
                 args.remote_file,
                 args.workdir,
-                _logger=_logger)
+                _logger=_logger,
+                dry_run=args.dry)
     elif args.subparsers_name == 'pbsdeploy':
         _logger.info("pbsdeploy command is detected.")
         pbs.deploy(host,
                    args.target,
                    args.destination,
                    _logger=_logger,
-                   use_rsync=use_rsync)
+                   use_rsync=use_rsync,
+                   dry_run=args.dry)
     elif args.subparsers_name == 'pbscheck':
         _logger.info("pbscheck command is detected.")
-        pbs.check(host, args.job_id)
+        pbs.check(host, args.job_id, dry_run=args.dry)
 
     _logger.info("loon ends here")
 

@@ -170,7 +170,7 @@ You can include data directory using `--data` flag, specify program like `bash` 
 
 - Upload and download files 
 
-Use them like `cp` command. At default, use `scp` command to do the job, set `--rsync` to use `rsync` command (`--rsync` is disabled in Windows).
+Use them like `cp` command. At default, use `scp` command to do the job, set `--rsync` to use `rsync` command (`--rsync` is disabled in Windows). Note there are some differences between scp and rsync, especially processing directory.
 
 ```shell
 $ loon upload -h

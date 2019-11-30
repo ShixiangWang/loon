@@ -81,9 +81,13 @@ class Host:
             json.dump(hosts, f)
         return
 
-    def add(self, name, username, host, port=22):
+    def add(self, name, username, host, port=22, dry_run=False):
         """Add a remote host"""
         info = [name, username, host, port]
+
+        if dry_run:
+            print("=> Running add", tuple(info[1:]))
+            sys.exit(0)
 
         if info in self.available_hosts:
             print("=> Input host exists. Will not change.")
@@ -114,8 +118,11 @@ class Host:
             sys.exit(1)
         return host
 
-    def delete(self, name, username, host, port=22):
+    def delete(self, name, username, host, port=22, dry_run=False):
         """Delete a remote host"""
+        if dry_run:
+            print("Running delete", (username, host, port))
+            sys.exit(0)
         host2del = self.host_check(name, username, host, port)
         print("=> Removing host from available list...")
         self.available_hosts.remove(host2del)
@@ -130,16 +137,23 @@ class Host:
         self.save_hosts()
         return
 
-    def switch(self, name, username, host, port=22):
+    def switch(self, name, username, host, port=22, dry_run=False):
         """Switch active host"""
+        if dry_run:
+            print("Running switch",
+                  (username, host, port) if username is not None else name)
+            sys.exit(0)
         host2switch = self.host_check(name, username, host, port)
         self.active_host = host2switch
         self.save_hosts()
         print("=> %s activated." % name)
         return
 
-    def rename(self, old, new):
+    def rename(self, old, new, dry_run=False):
         """Rename host name"""
+        if dry_run:
+            print("Running rename", old, "to", new)
+            sys.exit(0)
         host2rename = []
         for index, h in enumerate(self.available_hosts):
             if h[0] == old:
@@ -199,7 +213,8 @@ class Host:
             data_dir=None,
             remote_file=False,
             dir='/tmp',
-            prog=None):
+            prog=None,
+            dry_run=False):
         """Run command(s) in active remote host using channel session
         Therefore, `open_channel` in `connect` method must be `True` before using it.
 
@@ -213,6 +228,8 @@ class Host:
         Returns:
             A string containing result information
         """
+        if dry_run:
+            print("Running", "files:" if run_file else "commands:", commands)
         if not run_file:
             self.connect()
             self.channel.execute(commands)
@@ -329,7 +346,12 @@ class Host:
         # Return a string containing output from commands
         return "".join(datalist)
 
-    def upload(self, source, destination, _logger, use_rsync=False):
+    def upload(self,
+               source,
+               destination,
+               _logger,
+               use_rsync=False,
+               dry_run=False):
         """Upload files to active remote host.
 
         Currently, it is dependent on scp command.
@@ -339,6 +361,10 @@ class Host:
             destination [(str)]: destination directory in remote host
         """
         username, host, port = self.active_host[1:]
+        if dry_run:
+            print("Running upload", source, "to", destination, "on",
+                  self.active_host[1:])
+            sys.exit(0)
         # Make sure scp/rsync recognize destination as directory
         # Path must end with '/'
         if list(destination)[-1] != '/':
@@ -373,7 +399,12 @@ class Host:
         print("\n=> Finished uploading in %ss" % taken.seconds)
         return
 
-    def download(self, source, destination, _logger, use_rsync=False):
+    def download(self,
+                 source,
+                 destination,
+                 _logger,
+                 use_rsync=False,
+                 dry_run=False):
         """Download files to local machine from active remote host.
         
         Currently, it is dependent on scp command.
@@ -383,6 +414,10 @@ class Host:
             destination [(str)]: destination directory in local machine
         """
         username, host, port = self.active_host[1:]
+        if dry_run:
+            print("Running download", source, "to", destination, "from",
+                  self.active_host[1:])
+            sys.exit(0)
         if not isdir(os.path.expanduser(destination)):
             os.makedirs(os.path.expanduser(destination))
         # Make sure scp/rsync recognize destination as directory
@@ -431,11 +466,13 @@ class PBS:
         self.mapfile = os.path.join(data_dir, "mapping.csv")
         return
 
-    def gen_template(self, input, output):
+    def gen_template(self, input, output, dry_run=False):
         """Generate a PBS template"""
         if output is None:
             output = os.path.join(os.getcwd(), 'work.pbs')
         print("=> Generating %s" % output)
+        if dry_run:
+            sys.exit(0)
         if isfile(output):
             print("Warning: the output file exists, it will be overwritten.")
         if input is None:
@@ -464,7 +501,8 @@ class PBS:
                 mapfile,
                 outdir,
                 _logger,
-                pbs_mode=True):
+                pbs_mode=True,
+                dry_run=False):
         """Generate a batch of (script) files (PBS tasks) based on template and mapping file"""
         if not isdir(outdir):
             print("Directory %s does not exist, creating it" % outdir)
@@ -485,6 +523,9 @@ class PBS:
         print("Sample file : " + samplefile)
         print("Mapping file: " + mapfile)
         print("=====================")
+
+        if dry_run:
+            sys.exit(0)
 
         print("=> Reading %s ..." % samplefile)
         sample_data = read_csv(samplefile)
@@ -534,7 +575,7 @@ class PBS:
         print("Done.")
         return
 
-    def gen_pbs_example(self, outdir, _logger):
+    def gen_pbs_example(self, outdir, _logger, dry_run=False):
         """Generate example files for pbsgen command to specified directory"""
         if not isdir(outdir):
             print("Directory %s does not exist, creating it" % outdir)
@@ -549,13 +590,15 @@ class PBS:
         print("Sample file : " + samplefile)
         print("Mapping file: " + mapfile)
         print("=====================")
+        if dry_run:
+            sys.exit(0)
         copyfile(self.pbs_template, pbs_template)
         copyfile(self.samplefile, samplefile)
         copyfile(self.mapfile, mapfile)
         print("Done.")
         return
 
-    def sub(self, host, tasks, remote, workdir, _logger):
+    def sub(self, host, tasks, remote, workdir, _logger, dry_run=False):
         """Submit pbs tasks"""
         print('NOTE: PBS file must be LF mode (Unix), not CRLF mode (Windows)')
         print('====================================================')
@@ -579,6 +622,10 @@ class PBS:
                 workdir = '/tmp'
             cmds = 'cd {}; for i in {}; do qsub $i; done'.format(
                 workdir, ' '.join(filelist))
+
+            if dry_run:
+                print(cmds)
+                sys.exit(0)
             _logger.info(cmds)
             host.cmd(cmds, _logger=_logger)
         else:
@@ -594,20 +641,34 @@ class PBS:
                     elif isfile(f):
                         filelist.append(f)
                         cmds = 'cd ' + workdir + ';qsub ' + f
-                        _logger.info(cmds)
-                        run(cmds, shell=True)
+
+                        if dry_run:
+                            print(cmds)
+                        else:
+                            _logger.info(cmds)
+                            run(cmds, shell=True)
                     else:
                         print('Error: file %s does not exist.' % f)
                         sys.exit(1)
         return filelist
 
-    def deploy(self, host, source, destination, _logger, use_rsync=False):
+    def deploy(self,
+               host,
+               source,
+               destination,
+               _logger,
+               use_rsync=False,
+               dry_run=False):
         """Deploy target directory on the active remote host
         
         Upload the target destination and then submit all *.pbs files
         """
         if destination is None:
             destination = '/tmp'
+        if dry_run:
+            print("Running deploy", source, "to", destination, "on",
+                  tuple(host.active_host[1:]))
+            sys.exit(0)
         if not isdir(source):
             print("Error: directory %s does not exist" % source)
             sys.exit(1)
@@ -616,11 +677,18 @@ class PBS:
         self.sub(host, [destination + '/*.pbs'], True, destination, _logger)
         return
 
-    def check(self, host, job_id):
+    def check(self, host, job_id, dry_run=False):
         """Check PBS task status"""
         if job_id is None:
+            if dry_run:
+                print("Running qstat on", tuple(host.active_host[1:]))
+                sys.exit(0)
             return host.cmd('qstat')
         else:
+            if dry_run:
+                print("Running qstat", job_id, "on",
+                      tuple(host.active_host[1:]))
+                sys.exit(0)
             return host.cmd('qstat ' + job_id)
 
 
