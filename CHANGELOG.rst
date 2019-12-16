@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.3.2
+=============
+
+- Support pipe as input to `batch` command
+
 Version 0.3.0-0.3.1
 =============
 

@@ -3,7 +3,7 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/ShixiangWang/loon) 
 [![PyPI](https://img.shields.io/pypi/v/loon?color=blue)](https://pypi.org/project/loon/) 
 [![Documentation Status](https://readthedocs.org/projects/loon/badge/?version=latest)](https://loon.readthedocs.io/en/latest/?badge=latest) 
-![PyPI - Downloads](https://img.shields.io/pypi/dm/loon) 
+[![Downloads](https://pepy.tech/badge/loon)](https://pepy.tech/project/loon)
 [![HitCount](http://hits.dwyl.io/ShixiangWang/loon.svg)](http://hits.dwyl.io/ShixiangWang/loon)
 [![GitHub issues](https://img.shields.io/github/issues-raw/ShixiangWang/loon)](https://github.com/ShixiangWang/loon/issues?q=is%3Aopen+is%3Aissue) 
 [![GitHub last commit](https://img.shields.io/github/last-commit/ShixiangWang/loon)](https://github.com/ShixiangWang/loon/commits/master) 
@@ -205,7 +205,7 @@ optional arguments:
 
 - Batch process commands
 
-By providing a structed file (CSV, TSV etc) and a sample command with placeholders `{index}` refer to column index (0 based) of file, `batch` command can be used to execute a batch of commands. Users can set thread number by `-T` flag and use `--dry` flag to dry run the code.
+By providing a structed stdin/file (CSV, TSV etc) and a sample command with placeholders `{index}` refer to column index (0 based) of file, `batch` command can be used to execute a batch of commands. Users can set thread number by `-T` flag and use `--dry` flag to dry run the code.
 
 ```shell
 $ loon batch -f src/loon/data/samplefile.csv 'echo hello {0}'
@@ -225,6 +225,19 @@ $ loon batch -f src/loon/data/samplefile.csv 'echo hello {0}' --dry
 => Running echo hello TCGA-2A-A8VT-01
 => Running echo hello TCGA-2A-A8VV-01
 => Running echo hello TCGA-2A-A8VX-01
+```
+
+You can also read the input from pipe.
+
+```shell
+$ echo "yes,no" | loon batch 'echo {0} is not {1}'
+yes is not no
+
+$ cat src/loon/data/samplefile.csv | loon batch 'echo sample {0} has a longer name {1}'
+sample TCGA-2A-A8VO-01 has a longer name TCGA-2A-A8VO-01-01
+sample TCGA-2A-A8VT-01 has a longer name TCGA-2A-A8VT-01-01
+sample TCGA-2A-A8VV-01 has a longer name TCGA-2A-A8VV-01-01
+sample TCGA-2A-A8VX-01 has a longer name TCGA-2A-A8VX-01-01
 ```
 
 - Generate a batch of (script) files

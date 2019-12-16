@@ -4,6 +4,7 @@ Tool functions
 """
 
 import sys
+import io
 from subprocess import run
 from multiprocessing import Pool
 from loon.utils import isfile, isdir, read_csv
@@ -22,18 +23,24 @@ def batch(input,
           dry_run=False,
           _logger=None):
     """Batch process commands according to mappings from file"""
-    if not isfile(input):
-        print("Error: file %s does not exist" % input)
-        sys.exit(1)
+    # if not isfile(input):
+    #     print("Error: file %s does not exist" % input)
+    #     sys.exit(1)
 
-    data = read_csv(input, sep=sep, rm_comment=True)
-    if header:
-        # Remove header
-        _ = data.pop(0)
+    if isinstance(input, io.TextIOWrapper):
+        data = []
+        for row in input.readlines():
+            data.append(row.strip().split(sep=sep))
+    else:
+        data = read_csv(input, sep=sep, rm_comment=True)
+        if header:
+            # Remove header
+            _ = data.pop(0)
 
     cmd_list = []
     for row in data:
         try:
+            print(row)
             cmd_list.append(cmds.format(*row))
         except IndexError:
             print(r"Error: bad placeholder, valid is {0} to {%s}" %
