@@ -2,10 +2,10 @@
 Changelog
 =========
 
-Version 0.3.2
+Version 0.3.2-0.3.3
 =============
 
-- Support pipe as input to `batch` command
+- Support pipe as input to `batch` command (#20)
 
 Version 0.3.0-0.3.1
 =============

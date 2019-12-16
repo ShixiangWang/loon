@@ -40,7 +40,6 @@ def batch(input,
     cmd_list = []
     for row in data:
         try:
-            print(row)
             cmd_list.append(cmds.format(*row))
         except IndexError:
             print(r"Error: bad placeholder, valid is {0} to {%s}" %
