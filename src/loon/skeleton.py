@@ -230,6 +230,14 @@ def parse_args(args):
         type=argparse.FileType('r'),
         default=sys.stdin,
         nargs='?')
+    # parser_batch.add_argument(
+    #     '-o',
+    #     '--output',
+    #     help=
+    #     r'default is stdout, can be a file',
+    #     type=argparse.FileType('w'),
+    #     default=sys.stdout,
+    #     nargs='?')
     parser_batch.add_argument(
         '-s',
         '--sep',

@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.3.4
+=============
+
+- Fix a bug in `batch` command
+
 Version 0.3.2-0.3.3
 =============
 

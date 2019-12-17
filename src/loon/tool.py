@@ -11,7 +11,7 @@ from loon.utils import isfile, isdir, read_csv
 
 
 def prun(x):
-    y = run(x, shell=True)
+    y = run(x, shell=True, stdout=sys.stdout, stderr=sys.stderr)
     return y
 
 
@@ -50,21 +50,42 @@ def batch(input,
         _ = [print("=> Running %s" % cmd) for cmd in cmd_list]
         sys.exit(0)
 
+    # There is a bug when input from stdin I cannot figure out for now
     if thread > 1:
         _logger.info("Using %s threads" % str(thread))
-        with Pool(thread) as p:
-            run_res = p.map(prun, cmd_list)
-        for index, res in enumerate(run_res):
-            _logger.info("Status code: " + str(res.returncode))
-            if res.returncode != 0:
-                print("Error: job %s failed, please check the info!." %
-                      str(index))
+        with Pool(processes=thread) as p:
+            if isinstance(input, io.TextIOWrapper):
+                p.map(prun, cmd_list)
+                sys.exit(0)
+            else:
+                run_res = p.map(prun, cmd_list)
+                for _, res in enumerate(run_res):
+                    if res.returncode != 0:
+                        print("Error: some jobs failed, please take a check!.",
+                              file=sys.stderr)
+                        sys.exit(res.returncode)
     else:
+        _logger.info("Using %s threads" % str(thread))
         for cmd in cmd_list:
-            run_res = run(cmd, shell=True)
-            _logger.info("Status code: " + str(run_res.returncode))
-            if run_res.returncode != 0:
-                print("Error: some error occurred, please check the info!")
-                sys.exit(run_res.returncode)
+            if isinstance(input, io.TextIOWrapper):
+                run(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
+            else:
+                run_res = run(cmd,
+                              shell=True,
+                              stdout=sys.stdout,
+                              stderr=sys.stderr)
+                _logger.info("Status code: " + str(run_res.returncode))
+                if run_res.returncode != 0:
+                    print(
+                        "Error: an error detected when running the following command, please take a check!",
+                        file=sys.stderr)
+                    print("\t", cmd, file=sys.stderr)
+                    print("Status code: %s" % str(run_res.returncode),
+                          file=sys.stderr)
+                    print(
+                        "Please don't run with --verbose, there is a known issue with it.",
+                        file=sys.stderr)
+                    sys.exit(run_res.returncode)
+        sys.exit(0)
 
     return
