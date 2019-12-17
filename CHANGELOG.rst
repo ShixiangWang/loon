@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.4.0
+=============
+
+- Support column names as placeholders in the `batch` command
+
 Version 0.3.4
 =============
 

@@ -1,0 +1,3 @@
+user,score
+wsx,100
+zd,100

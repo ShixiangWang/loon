@@ -5,6 +5,7 @@ Tool functions
 
 import sys
 import io
+import re
 from subprocess import run
 from multiprocessing import Pool
 from loon.utils import isfile, isdir, read_csv
@@ -33,9 +34,21 @@ def batch(input,
             data.append(row.strip().split(sep=sep))
     else:
         data = read_csv(input, sep=sep, rm_comment=True)
-        if header:
+
+    if header:
+        if re.compile(r'{\d+}').search(cmds) is not None:
             # Remove header
             _ = data.pop(0)
+        elif re.compile(r'{.+}').search(cmds) is not None:
+            colnames = data.pop(0)
+            for index,name in enumerate(colnames):
+                pattern = "{{{}}}".format(name)
+                sub = "{{{}}}".format(index)
+                if re.compile(pattern).search(cmds) is not None:
+                    cmds = cmds.replace(pattern,sub)
+        else:
+            print("Please set correct placeholders either with {numeric} or {column_names} format!", file=sys.stderr)
+            sys.exit(1)
 
     cmd_list = []
     for row in data:
@@ -43,7 +56,10 @@ def batch(input,
             cmd_list.append(cmds.format(*row))
         except IndexError:
             print(r"Error: bad placeholder, valid is {0} to {%s}" %
-                  (str(len(row) - 1)))
+                  (str(len(row) - 1)), file=sys.stderr)
+            sys.exit(1)
+        except KeyError:
+            print("Error: bad placeholder, valid are", colnames, file=sys.stderr)
             sys.exit(1)
 
     if dry_run:

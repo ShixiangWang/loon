@@ -205,7 +205,7 @@ optional arguments:
 
 - Batch process commands
 
-By providing a structed stdin/file (CSV, TSV etc) and a sample command with placeholders `{index}` refer to column index (0 based) of file, `batch` command can be used to execute a batch of commands. Users can set thread number by `-T` flag and use `--dry` flag to dry run the code.
+By providing a structed stdin/file (CSV, TSV etc) and a sample command with placeholders `{index}` refer to column index (0 based) or column name of file, `batch` command can be used to execute a batch of commands. Users can set thread number by `-T` flag and use `--dry` flag to dry run the code.
 
 ```shell
 $ loon batch -f src/loon/data/samplefile.csv 'echo hello {0}'
@@ -239,6 +239,30 @@ sample TCGA-2A-A8VT-01 has a longer name TCGA-2A-A8VT-01-01
 sample TCGA-2A-A8VV-01 has a longer name TCGA-2A-A8VV-01-01
 sample TCGA-2A-A8VX-01 has a longer name TCGA-2A-A8VX-01-01
 ```
+
+You can also handle header and refer to column names with index or name!
+
+```
+$ cat tests/header.txt | loon batch 'echo hello {0}' 
+hello user
+hello wsx
+hello zd
+
+$ cat tests/header.txt | loon batch 'echo hello {0}' --header
+hello wsx
+hello zd
+$ cat tests/header.txt | loon batch 'echo hello {0}, your score is {1}' --header
+hello wsx, your score is 100
+hello zd, your score is 100
+
+$ cat tests/header.txt | loon 'echo hello {user}, your score is {score}' --header
+hello wsx, your score is 100
+hello zd, your score is 100
+$ cat tests/header2.txt | loon 'echo hello {user name}, your score is {score}' --header
+hello wsx, your score is 100
+hello zd, your score is 100
+```
+
 
 - Generate a batch of (script) files
 
