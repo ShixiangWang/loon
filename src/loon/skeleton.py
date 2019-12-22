@@ -35,6 +35,7 @@ def parse_args(args):
 
     # Show version info
     parser.add_argument(
+        "-V",
         "--version",
         action="version",
         version="loon {ver} released under {license} license.".format(

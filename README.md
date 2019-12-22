@@ -304,7 +304,7 @@ More details please see `-h` option of the commands above.
 ### Current usage info
 
 ```shell
-usage: loon [-h] [--version] [--author]
+usage: loon [-h] [-V] [--author]
                    {add,delete,switch,list,rename,run,upload,download,gen,batch,pbstemp,pbsgen,pbsgen_example,pbssub,pbsdeploy,pbscheck}
                    ...
 
