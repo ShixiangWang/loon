@@ -82,7 +82,18 @@ class Host:
         return
 
     def add(self, name, username, host, port=22, dry_run=False):
-        """Add a remote host"""
+        """Add a remote host
+        
+        Args:
+            name: hostname alias, a string
+            username: hostname, a string
+            host: host ip address, a string
+            port: host ip port, an integer
+            dry_run: if `True`, dry run the code
+
+        Returns:
+            None
+        """
         info = [name, username, host, port]
 
         if dry_run:
@@ -101,6 +112,17 @@ class Host:
         return
 
     def host_check(self, name, username, host, port=22):
+        """Check if a host exists
+
+        Args:
+            name: hostname alias, a string
+            username: hostname, a string
+            host: host ip address, a string
+            port: host ip port, an integer
+        
+        Returns:
+            a list representing the host
+        """
         host = []
         if name is not None:
             for h in self.available_hosts:
@@ -119,7 +141,18 @@ class Host:
         return host
 
     def delete(self, name, username, host, port=22, dry_run=False):
-        """Delete a remote host"""
+        """Delete a remote host
+        
+        Args:
+            name: hostname alias, a string
+            username: hostname, a string
+            host: host ip address, a string
+            port: host ip port, an integer
+            dry_run: if `True`, dry run the code
+
+        Returns:
+            None
+        """
         if dry_run:
             print("Running delete", (username, host, port))
             sys.exit(0)
@@ -138,7 +171,18 @@ class Host:
         return
 
     def switch(self, name, username, host, port=22, dry_run=False):
-        """Switch active host"""
+        """Switch active host
+        
+        Args:
+            name: hostname alias, a string
+            username: hostname, a string
+            host: host ip address, a string
+            port: host ip port, an integer
+            dry_run: if `True`, dry run the code
+
+        Returns:
+            None
+        """
         if dry_run:
             print("Running switch",
                   (username, host, port) if username is not None else name)
@@ -150,7 +194,16 @@ class Host:
         return
 
     def rename(self, old, new, dry_run=False):
-        """Rename host name"""
+        """Rename host name
+        
+        Args: 
+            old: a string representing the old host name alias
+            new: a string representing the new host name alias
+            dry_run: if `True`, dry run the code
+
+        Returns:
+            None
+        """
         if dry_run:
             print("Running rename", old, "to", new)
             sys.exit(0)
@@ -185,7 +238,16 @@ class Host:
                 privatekey_file="~/.ssh/id_rsa",
                 passphrase='',
                 open_channel=True):
-        """Connect active host and open a session."""
+        """Connect active host and open a session
+        
+        Args:
+            privatekey_file: a string representing the path to the private key file
+            passphrase: a string representing the password
+            open_channel: if `True`, open the SSH channel
+
+        Returns:
+            None
+        """
         privatekey_file = os.path.expanduser(privatekey_file)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((self.active_host[2], self.active_host[3]))
@@ -219,11 +281,14 @@ class Host:
         Therefore, `open_channel` in `connect` method must be `True` before using it.
 
         Args:
-            commands ([str]): commands/scripts run on active remote host
-            run_file ([bool]): if `True`, run scripts instead of commands
-            data_dir ([str]): a path representing data directory
-            remote_file ([bool]): if `True`, collect input from remote host instead of local machine
-            dir ([str]): Remote directory for storing local scripts
+            commands: commands/scripts run on active remote host
+            _logger: the logging logger
+            run_file: if `True`, run scripts instead of commands
+            data_dir: a path representing data directory
+            remote_file: if `True`, collect input from remote host instead of local machine
+            dir: Remote directory for storing local scripts
+            prog: a string representing the program to run the commands
+            dry_run: if `True`, dry run the code
 
         Returns:
             A string containing result information
@@ -326,7 +391,14 @@ class Host:
         return "".join(datalist)
 
     def get_result(self, print_info=True):
-        """Get result from executed channel"""
+        """Get result from executed channel
+        
+        Args:
+            print_info: if `True`, print information
+        
+        Returns:
+            a string containing output from executed commands
+        """
         size, errinfo = self.channel.read_stderr()
         if size > 0:
             print('An error is raised by remote host, please read the info:\n')
@@ -358,8 +430,14 @@ class Host:
         Currently, it is dependent on scp command.
 
         Args:
-            source [(list)]: list of files (directories) in local machine
-            destination [(str)]: destination directory in remote host
+            source: list of files (directories) in local machine
+            destination: destination directory in remote host
+            _logger: the logging logger
+            use_rsync: if `True`, use rsync instead of scp
+            dry_run: if `True`, dry run the code
+
+        Returns:
+            None
         """
         username, host, port = self.active_host[1:]
         if dry_run:
@@ -411,8 +489,14 @@ class Host:
         Currently, it is dependent on scp command.
 
         Args:
-            source [(list)]: list of files (directories) in remote host
-            destination [(str)]: destination directory in local machine
+            source: list of files (directories) in remote host
+            destination: destination directory in local machine
+            _logger: the logging logger
+            use_rsync: if `True`, use rsync instead of scp
+            dry_run: if `True`, dry run the code
+
+        Returns:
+            None
         """
         username, host, port = self.active_host[1:]
         if dry_run:
@@ -468,7 +552,16 @@ class PBS:
         return
 
     def gen_template(self, input, output, dry_run=False):
-        """Generate a PBS template"""
+        """Generate a PBS template
+        
+        Args:
+            input: a string representing the path to template file
+            output: a string representing the path to output file
+            dyr_run: if `True`, dry run the code
+
+        Returns:
+            None
+        """
         if output is None:
             output = os.path.join(os.getcwd(), 'work.pbs')
         print("=> Generating %s" % output)
@@ -504,7 +597,20 @@ class PBS:
                 _logger,
                 pbs_mode=True,
                 dry_run=False):
-        """Generate a batch of (script) files (PBS tasks) based on template and mapping file"""
+        """Generate a batch of (script) files (PBS tasks) based on template and mapping file
+        
+        Args:
+            template: a string representing the path to the template file
+            samplefile: a string representing the path to the sample file
+            mapfile: a string representing the path to the mapping file
+            outdir: a string representing the path to output directory
+            _logger: the logging logger
+            pbs_mode: if `True`, use PBS mode
+            dry_run: if `True`, dry run the code
+
+        Returns:
+            None
+        """
         if not isdir(outdir):
             print("Directory %s does not exist, creating it" % outdir)
             os.makedirs(outdir)
@@ -577,7 +683,16 @@ class PBS:
         return
 
     def gen_pbs_example(self, outdir, _logger, dry_run=False):
-        """Generate example files for pbsgen command to specified directory"""
+        """Generate example files for pbsgen command to specified directory
+        
+        Args:
+            outdir: a string representing the output directory
+            _logger: the logging logger
+            dry_run: if `True`, dry run the code
+
+        Returns:
+            None
+        """
         if not isdir(outdir):
             print("Directory %s does not exist, creating it" % outdir)
             os.makedirs(outdir)
@@ -600,7 +715,19 @@ class PBS:
         return
 
     def sub(self, host, tasks, remote, workdir, _logger, dry_run=False):
-        """Submit pbs tasks"""
+        """Submit pbs tasks
+        
+        Args:
+            host: a host object
+            tasks: a list of PBS files, glob pattern is supported
+            remote: if `True`, means that PBS task files are located at the active remote host
+            workdir: a directory representing the working directory
+            _logger: the logging logger
+            dry_run: if `True`, dry run the code
+
+        Returns:
+            A list of files
+        """
         print('NOTE: PBS file must be LF mode (Unix), not CRLF mode (Windows)')
         print('====================================================')
         filelist = []
@@ -662,7 +789,18 @@ class PBS:
                dry_run=False):
         """Deploy target directory on the active remote host
         
-        Upload the target destination and then submit all *.pbs files
+        Upload the target destination and then submit all *.pbs files.
+
+        Args:
+            host: a host object
+            source: a string representing the directory (contains .pbs files) to upload
+            destination: a string representing the path on remote host
+            _logger: the logging logger
+            use_rsync: if `True`, use rsync instead of scp
+            dry_run: if `True`, dry run the code
+
+        Returns:
+            None
         """
         if destination is None:
             destination = '/tmp'
@@ -679,7 +817,16 @@ class PBS:
         return
 
     def check(self, host, job_id, dry_run=False):
-        """Check PBS task status"""
+        """Check PBS task status
+        
+        Args:
+            host: a host object
+            job_id: a string the job id
+            dry_run: if `True`, dry run the code
+
+        Returns:
+            Job status
+        """
         if job_id is None:
             if dry_run:
                 print("Running qstat on", tuple(host.active_host[1:]))

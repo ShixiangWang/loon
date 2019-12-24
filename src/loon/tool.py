@@ -23,7 +23,20 @@ def batch(input,
           thread=1,
           dry_run=False,
           _logger=None):
-    """Batch process commands according to mappings from file"""
+    """Batch process commands according to mappings from file
+    
+    Args:
+        input: stdin or a path to input file
+        cmds: template command (with placeholder) to run
+        sep: separator, default is ','
+        header: set `True` if input data contains a header line
+        thread: number of threads to run in parallel
+        dry_run: if `True`, dry run the code
+        _logger: the logging logger
+
+    Returns:
+        None
+    """
     # if not isfile(input):
     #     print("Error: file %s does not exist" % input)
     #     sys.exit(1)
@@ -41,13 +54,15 @@ def batch(input,
             _ = data.pop(0)
         elif re.compile(r'{.+}').search(cmds) is not None:
             colnames = data.pop(0)
-            for index,name in enumerate(colnames):
+            for index, name in enumerate(colnames):
                 pattern = "{{{}}}".format(name)
                 sub = "{{{}}}".format(index)
                 if re.compile(pattern).search(cmds) is not None:
-                    cmds = cmds.replace(pattern,sub)
+                    cmds = cmds.replace(pattern, sub)
         else:
-            print("Please set correct placeholders either with {numeric} or {column_names} format!", file=sys.stderr)
+            print(
+                "Please set correct placeholders either with {numeric} or {column_names} format!",
+                file=sys.stderr)
             sys.exit(1)
 
     cmd_list = []
@@ -56,10 +71,13 @@ def batch(input,
             cmd_list.append(cmds.format(*row))
         except IndexError:
             print(r"Error: bad placeholder, valid is {0} to {%s}" %
-                  (str(len(row) - 1)), file=sys.stderr)
+                  (str(len(row) - 1)),
+                  file=sys.stderr)
             sys.exit(1)
         except KeyError:
-            print("Error: bad placeholder, valid are", colnames, file=sys.stderr)
+            print("Error: bad placeholder, valid are",
+                  colnames,
+                  file=sys.stderr)
             sys.exit(1)
 
     if dry_run:

@@ -2,6 +2,7 @@
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/ShixiangWang/loon) 
 [![PyPI](https://img.shields.io/pypi/v/loon?color=blue)](https://pypi.org/project/loon/) 
+[![pylint](https://img.shields.io/badge/pylint%20score-10-blue.svg)](https://pypi.org/project/loon/)
 [![Documentation Status](https://readthedocs.org/projects/loon/badge/?version=latest)](https://loon.readthedocs.io/en/latest/?badge=latest) 
 [![Downloads](https://pepy.tech/badge/loon)](https://pepy.tech/project/loon)
 [![HitCount](http://hits.dwyl.io/ShixiangWang/loon.svg)](http://hits.dwyl.io/ShixiangWang/loon)
@@ -304,7 +305,7 @@ More details please see `-h` option of the commands above.
 ### Current usage info
 
 ```shell
-usage: loon [-h] [--version] [--author]
+usage: loon [-h] [-V] [--author]
                    {add,delete,switch,list,rename,run,upload,download,gen,batch,pbstemp,pbsgen,pbsgen_example,pbssub,pbsdeploy,pbscheck}
                    ...
 

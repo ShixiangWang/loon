@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.4.1
+=============
+
+- Add version flag `-V`
+- Add documentation for functions and methods
+
 Version 0.4.0
 =============
 
