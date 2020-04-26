@@ -228,7 +228,7 @@ def parse_args(args):
         '--file',
         help=
         r'A structed file/stdin like CSV, TSV etc. Each column is placeholder target, i.e. {0} targets the first column, {1} targets the second column, etc.',
-        type=argparse.FileType('r'),
+        type=argparse.FileType('r', encoding='UTF-8'),
         default=sys.stdin,
         nargs='?')
     # parser_batch.add_argument(
