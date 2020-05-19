@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.4.2
+=============
+
+- Resolve issue with encoding
+
 Version 0.4.1
 =============
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 __author__ = "ShixiangWang"
 __copyright__ = "ShixiangWang"
 __license__ = "mit"
